@@ -203,7 +203,7 @@ html.dark {
   min-height: 0;
 }
 
-/* === СПИСОК КЕЙСОВ (адаптивная ширина) === */
+/* === СПИСОК КЕЙСОВ (на десктопе и iPad) === */
 .case-list {
   min-width: 280px;
   width: 30%;
@@ -440,7 +440,7 @@ html.dark {
   overflow: hidden;
 }
 
-/* === ПРОСМОТР КЕЙСА (гибкая ширина) === */
+/* === ПРОСМОТР КЕЙСА (адаптивная ширина) === */
 .case-view {
   flex: 1 1 65%;
   min-width: 300px;
@@ -549,7 +549,63 @@ html.dark {
   background: var(--accent-active);
 }
 
-/* === АДАПТИВНОСТЬ (мобильные и iPad) === */
+/* === МОБИЛЬНЫЙ АККОРДЕОН === */
+.case-list-mobile-wrapper {
+  width: 100%;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 0.5px solid var(--separator);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.mobile-accordion-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 0.5px solid var(--separator);
+  transition: background var(--transition);
+}
+
+.mobile-accordion-header:hover {
+  background: var(--bg-secondary);
+}
+
+.mobile-accordion-header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.accordion-arrow {
+  font-size: 16px;
+  transition: transform 0.25s ease;
+  color: var(--text-tertiary);
+}
+
+.accordion-arrow.up {
+  transform: rotate(-180deg);
+}
+
+.accordion-arrow.down {
+  transform: rotate(0);
+}
+
+.mobile-accordion-panel {
+  background: var(--bg-card);
+  transition: max-height 0.35s ease, opacity 0.25s ease;
+  overflow: hidden;
+}
+
+/* === АДАПТИВНОСТЬ (мобильные) === */
 @media (max-width: 768px) {
   .app-container {
     flex-direction: column;
@@ -561,16 +617,19 @@ html.dark {
   }
 
   .case-list {
-    width: 100%;
-    max-width: 100%;
-    height: auto;
-    min-width: auto;
+    display: none;
   }
 
   .case-view {
     width: 100%;
-    font-size: 17px;
+    order: 2;
+    font-size: 16px;
     padding: 20px;
+  }
+
+  .case-list-mobile-wrapper {
+    order: 1;
+    margin-bottom: 0;
   }
 
   .search-input-header {
@@ -614,19 +673,18 @@ html.dark {
   }
 }
 
-/* === ДЕСКТОП / iPad (горизонтальный режим, большие экраны) === */
-@media (min-width: 769px) and (orientation: landscape) {
+/* === ДЕСКТОП / iPad (большие экраны) === */
+@media (min-width: 769px) {
+  .case-list-mobile-wrapper {
+    display: none;
+  }
+
   .case-list {
-    min-width: 300px;
-    width: 25%;
-    max-width: 400px;
+    display: flex;
   }
 
   .case-view {
-    flex: 1 1 70%;
-    min-width: 400px;
-    padding: 32px;
-    font-size: 18px;
+    order: 2;
   }
 }
 
@@ -644,12 +702,17 @@ html.dark {
     padding: 40px;
     font-size: 18px;
   }
+}
 
-  .case-item p {
-    font-size: 14px;
+@media (min-width: 769px) and (orientation: landscape) {
+  .case-list {
+    width: 25%;
+    max-width: 400px;
   }
 
-  .search-input-header {
-    font-size: 15px;
+  .case-view {
+    flex: 1 1 70%;
+    min-width: 400px;
+    padding: 32px;
   }
 }
