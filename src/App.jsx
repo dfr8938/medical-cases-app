@@ -15,30 +15,23 @@ const App = () => {
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
 
-  // Удаление preloader после загрузки
+  // Удаление preloader
   useEffect(() => {
     if (document.body.classList.contains("loaded")) return;
-
     document.body.classList.add("loaded");
-
     const timer = setTimeout(() => {
       const preloader = document.getElementById("preloader");
-      if (preloader) {
-        preloader.remove();
-      }
+      if (preloader) preloader.remove();
     }, 600);
-
     return () => clearTimeout(timer);
   }, []);
 
-  // Проверка темы при загрузке
+  // Проверка темы
   useEffect(() => {
     const saved = localStorage.getItem("darkMode");
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-
     const enabled = saved ? JSON.parse(saved) : prefersDark;
     setIsDarkMode(enabled);
-
     if (enabled) {
       document.documentElement.classList.add("dark");
       document.body.classList.add("dark-mode");
@@ -53,7 +46,6 @@ const App = () => {
     const newMode = !isDarkMode;
     setIsDarkMode(newMode);
     localStorage.setItem("darkMode", JSON.stringify(newMode));
-
     if (newMode) {
       document.documentElement.classList.add("dark");
       document.body.classList.add("dark-mode");
@@ -63,24 +55,21 @@ const App = () => {
     }
   };
 
-  // Фильтрация кейсов
+  // Фильтрация
   const filteredCases = base.filter((item) => {
     const query = searchTerm.toLowerCase().trim();
     if (!query) return true;
-
     return (
       item.situation.toLowerCase().includes(query) ||
       item.nursingExamination.toLowerCase().includes(query) ||
       item.inspection.toLowerCase().includes(query) ||
       item.appointment.toLowerCase().includes(query) ||
       item.anamnesis.toLowerCase().includes(query) ||
-      item.patientProblems.some((prob) =>
-        prob.problem.toLowerCase().includes(query)
-      ) ||
+      item.patientProblems.some((p) => p.problem.toLowerCase().includes(query)) ||
       item.nursingCarePlan.some(
-        (plan) =>
-          plan.title.toLowerCase().includes(query) ||
-          plan.plan.some((p) => p.planItem.toLowerCase().includes(query))
+        (p) =>
+          p.title.toLowerCase().includes(query) ||
+          p.plan.some((pl) => pl.planItem.toLowerCase().includes(query))
       )
     );
   });
@@ -110,7 +99,6 @@ const App = () => {
   useEffect(() => {
     const handleKey = (e) => {
       if (e.target.tagName === "INPUT") return;
-
       if (e.key === "/") {
         e.preventDefault();
         inputRef.current?.focus();
@@ -131,13 +119,10 @@ const App = () => {
   // Подсветка текста
   const highlightText = (text, query) => {
     if (!query || !text) return <span>{text}</span>;
-
     const keywords = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
     if (keywords.length === 0) return <span>{text}</span>;
-
     const regex = new RegExp(`(${keywords.map(escapeRegExp).join("|")})`, "gi");
     const parts = text.split(regex);
-
     return (
       <span>
         {parts.map((part, i) =>
@@ -157,7 +142,7 @@ const App = () => {
     return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   };
 
-  // Свайп для пагинации
+  // Свайпы
   const handleTouchStart = (e) => {
     touchStartX.current = e.touches[0].clientX;
   };
@@ -169,9 +154,7 @@ const App = () => {
   const handleTouchEnd = () => {
     const diff = touchStartX.current - touchEndX.current;
     const threshold = 50;
-
     if (Math.abs(diff) < threshold) return;
-
     if (diff > 0 && currentPage < totalPages) {
       nextPage();
     } else if (diff < 0 && currentPage > 1) {
@@ -180,12 +163,7 @@ const App = () => {
   };
 
   return (
-    <div
-      className="app"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-    >
+    <div className="app" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
       <header className="app-header">
         <h1>Медицинские кейсы</h1>
 
@@ -196,9 +174,7 @@ const App = () => {
             </span>
             {searchTerm && (
               <span
-                className={`stat-item stat-found ${
-                  filteredCases.length === 0 ? "stat-found-zero" : ""
-                }`}
+                className={`stat-item stat-found ${filteredCases.length === 0 ? "stat-found-zero" : ""}`}
               >
                 🔍 Найдено: <strong>{filteredCases.length}</strong>
               </span>
@@ -217,69 +193,102 @@ const App = () => {
             <span className="theme-label">🌙</span>
           </div>
         </div>
-
-        <div className="search-bar-top">
-          <input
-            ref={inputRef}
-            type="text"
-            placeholder="🔍 Поиск по кейсам: АД диета нитроглицерин..."
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="search-input-top"
-          />
-          {searchTerm && (
-            <button
-              onClick={() => {
-                setSearchTerm("");
-                setCurrentPage(1);
-              }}
-              className="clear-btn-top"
-              aria-label="Очистить поиск"
-            >
-              ×
-            </button>
-          )}
-        </div>
       </header>
 
       <div className="app-container">
-        {/* Список кейсов — всегда открыт */}
+        {/* Список кейсов */}
         <div className="case-list">
           <div className="case-list-header">
             <h3>
               Кейсы {searchTerm && `(${filteredCases.length} найдено)`}
             </h3>
+
+            {/* Поиск и пагинация в одной области */}
+            <div className="search-and-pagination">
+              {/* Поиск */}
+              <div className="search-in-header">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  placeholder="Поиск по списку..."
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="search-input-header"
+                />
+                {searchTerm && (
+                  <button
+                    onClick={() => {
+                      setSearchTerm("");
+                      setCurrentPage(1);
+                    }}
+                    className="clear-btn-header"
+                    aria-label="Очистить поиск"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+
+              {/* Пагинация — только если НЕ в поиске и больше одной страницы */}
+              {!searchTerm && totalPages > 1 && (
+                <div className="ios-pagination">
+                  <button
+                    onClick={prevPage}
+                    disabled={currentPage === 1}
+                    className="ios-pagination-arrow"
+                    aria-label="Предыдущая страница"
+                  >
+                    ◀
+                  </button>
+
+                  <div className="ios-pagination-pages">
+                    {Array.from({ length: totalPages }, (_, i) => {
+                      const page = i + 1;
+                      const isCurrent = page === currentPage;
+                      const isNear = Math.abs(page - currentPage) <= 1;
+                      const isFirstOrLast = page === 1 || page === totalPages;
+
+                      if (isFirstOrLast || isNear) {
+                        return (
+                          <button
+                            key={page}
+                            onClick={() => goToPage(page)}
+                            className={`ios-pagination-page ${isCurrent ? "active" : ""}`}
+                          >
+                            {page}
+                          </button>
+                        );
+                      } else if (
+                        page === currentPage - 2 ||
+                        page === currentPage + 2
+                      ) {
+                        return (
+                          <span key={page} className="ios-pagination-ellipsis">
+                            …
+                          </span>
+                        );
+                      }
+                      return null;
+                    })}
+                  </div>
+
+                  <button
+                    onClick={nextPage}
+                    disabled={currentPage === totalPages}
+                    className="ios-pagination-arrow"
+                    aria-label="Следующая страница"
+                  >
+                    ▶
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Поиск в шапке списка */}
-          <div className="search-in-header">
-            <input
-              type="text"
-              placeholder="Поиск по списку..."
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="search-input-header"
-            />
-            {searchTerm && (
-              <button
-                onClick={() => {
-                  setSearchTerm("");
-                  setCurrentPage(1);
-                }}
-                className="clear-btn-header"
-                aria-label="Очистить поиск"
-              >
-                ×
-              </button>
-            )}
-          </div>
-
+          {/* Список кейсов */}
           {!hasResults ? (
             <p className="no-results">
               По запросу "{searchTerm}" ничего не найдено.
@@ -290,88 +299,36 @@ const App = () => {
               return (
                 <div
                   key={item.id}
-                  className={`case-item ${
-                    selectedCase.id === item.id ? "active" : ""
-                  }`}
+                  className={`case-item ${selectedCase.id === item.id ? "active" : ""}`}
                   onClick={() => isMatch && changeCaseWithAnimation(item)}
                   style={{
                     opacity: isMatch ? 1 : 0.6,
                     cursor: isMatch ? "pointer" : "not-allowed",
                   }}
                 >
-                  <strong>Кейс {item.id}</strong>
-                  <p>
-                    {highlightText(
-                      item.situation.substring(0, 80) + "...",
-                      searchTerm
+                  <div className="case-item-left">
+                    <strong>Кейс {item.id}</strong>
+                    <p>
+                      {highlightText(
+                        item.situation.substring(0, 80) + "...",
+                        searchTerm
+                      )}
+                    </p>
+                    {!isMatch && (
+                      <small style={{ color: "#e53e30", fontSize: "12px" }}>
+                        не соответствует
+                      </small>
                     )}
-                  </p>
-                  {!isMatch && (
-                    <small style={{ color: "#e53e30", fontSize: "12px" }}>
-                      не соответствует
-                    </small>
-                  )}
+                  </div>
                 </div>
               );
             })
           )}
-
-          {totalPages > 1 && (
-            <div className="ios-pagination-container">
-              <div className="ios-pagination">
-                <button
-                  onClick={prevPage}
-                  disabled={currentPage === 1}
-                  className="ios-pagination-arrow"
-                  aria-label="Предыдущая страница"
-                >
-                  ◀
-                </button>
-
-                <div className="ios-pagination-pages">
-                  {Array.from({ length: totalPages }, (_, i) => {
-                    const page = i + 1;
-                    const isCurrent = page === currentPage;
-                    const isNear = Math.abs(page - currentPage) <= 1;
-                    const isFirstOrLast = page === 1 || page === totalPages;
-
-                    if (isFirstOrLast || isNear) {
-                      return (
-                        <button
-                          key={page}
-                          onClick={() => goToPage(page)}
-                          className={`ios-pagination-page ${isCurrent ? "active" : ""}`}
-                        >
-                          {page}
-                        </button>
-                      );
-                    } else if (page === currentPage - 2 || page === currentPage + 2) {
-                      return <span key={page} className="ios-pagination-ellipsis">…</span>;
-                    }
-                    return null;
-                  })}
-                </div>
-
-                <button
-                  onClick={nextPage}
-                  disabled={currentPage === totalPages}
-                  className="ios-pagination-arrow"
-                  aria-label="Следующая страница"
-                >
-                  ▶
-                </button>
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* Просмотр кейса */}
+        {/* Просмотр выбранного кейса */}
         <div className={`case-view ${isAnimating ? "fade-out" : "fade-in"}`}>
           <h2>Кейс {selectedCase.id}</h2>
-
-          <button onClick={() => window.print()} className="print-btn">
-            🖨️ Распечатать
-          </button>
 
           <section>
             <h4>Ситуация</h4>
@@ -385,7 +342,12 @@ const App = () => {
 
           <section>
             <h4>Анамнез</h4>
-            <p>{highlightText(selectedCase.anamnesis || "Не указан", searchTerm)}</p>
+            <p>
+              {highlightText(
+                selectedCase.anamnesis || "Не указан",
+                searchTerm
+              )}
+            </p>
           </section>
 
           <section>
@@ -402,7 +364,9 @@ const App = () => {
             <h4>Проблемы пациента</h4>
             <ul>
               {selectedCase.patientProblems.map((prob) => (
-                <li key={prob.id}>{highlightText(prob.problem, searchTerm)}</li>
+                <li key={prob.id}>
+                  {highlightText(prob.problem, searchTerm)}
+                </li>
               ))}
             </ul>
           </section>
@@ -416,7 +380,9 @@ const App = () => {
                   {item.plan.length > 0 && (
                     <ul>
                       {item.plan.map((p) => (
-                        <li key={p.id}>{highlightText(p.planItem, searchTerm)}</li>
+                        <li key={p.id}>
+                          {highlightText(p.planItem, searchTerm)}
+                        </li>
                       ))}
                     </ul>
                   )}
@@ -427,6 +393,7 @@ const App = () => {
         </div>
       </div>
 
+      {/* Кнопка "Наверх" */}
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         className="scroll-top"

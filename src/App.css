@@ -1,4 +1,6 @@
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -18,57 +20,60 @@ body {
   font-family: -apple-system, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #f2f2f7;
-  color: #1c1c1e;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   line-height: 1.6;
   margin: 0;
   min-height: 100vh;
   height: 100%;
   overflow-x: hidden;
+  overflow-y: auto;
   padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0)
             env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
   position: relative;
 }
 
-/* === ЦВЕТА (iOS) === */
+/* === ЦВЕТА И ПЕРЕМЕННЫЕ (iOS-стиль) === */
 :root {
   --bg-primary: #f2f2f7;
   --bg-secondary: #e5e5ea;
+  --bg-tertiary: #d1d1d6;
   --bg-card: white;
   --text-primary: #000000;
   --text-secondary: #86868b;
   --text-tertiary: #8e8e93;
   --accent: #007aff;
   --accent-hover: #0071eb;
+  --accent-active: #0062d3;
   --separator: #c6c6c8;
-  --highlight: #fff352;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --highlight: #fff352;
   --input-height: 44px;
   --header-height: 80px;
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: all 0.15s ease;
 }
 
+/* === ТЁМНАЯ ТЕМА === */
 html.dark {
   --bg-primary: #000000;
   --bg-secondary: #1c1c1e;
+  --bg-tertiary: #2c2c2e;
   --bg-card: #1c1c1e;
   --text-primary: #ffffff;
   --text-secondary: #8e8e93;
   --text-tertiary: #6e6e71;
   --accent: #0a84ff;
   --accent-hover: #0077ed;
+  --accent-active: #0062d3;
   --separator: #3a3a3c;
-  --highlight: #ffd60a;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-html.dark,
-html.dark body {
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --highlight: #ffd60a;
 }
 
 /* === ОСНОВНОЙ КОНТЕЙНЕР === */
@@ -79,12 +84,15 @@ html.dark body {
   min-height: calc(100vh - env(safe-area-inset-bottom));
   background: var(--bg-primary);
   padding-bottom: max(20px, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 /* === ЗАГОЛОВОК === */
 .app-header {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   padding-top: env(safe-area-inset-top);
 }
 
@@ -156,7 +164,7 @@ html.dark body {
   position: relative;
   width: 50px;
   height: 31px;
-  background: #e5e5ea;
+  background: var(--bg-tertiary);
   border-radius: 15.5px;
   border: none;
   cursor: pointer;
@@ -165,7 +173,7 @@ html.dark body {
 }
 
 .theme-toggle-switch.dark {
-  background: #acacac;
+  background: var(--accent);
 }
 
 .toggle-thumb {
@@ -183,83 +191,39 @@ html.dark body {
 
 .theme-toggle-switch.dark .toggle-thumb {
   transform: translateX(22px);
-  background: #ffffff;
-}
-
-/* === ГЛОБАЛЬНЫЙ ПОИСК === */
-.search-bar-top {
-  max-width: 500px;
-  margin: 0 auto 20px;
-  border-radius: 10px;
-  overflow: hidden;
   background: white;
-  border: 0.5px solid var(--separator);
-  box-shadow: var(--shadow);
-  position: relative;
 }
 
-.search-input-top {
-  width: 100%;
-  height: var(--input-height);
-  padding: 0 40px;
-  font-size: 16px;
-  border: none;
-  outline: none;
-  background: transparent;
-  color: var(--text-primary);
-}
-
-.search-input-top::placeholder {
-  color: var(--text-tertiary);
-}
-
-.clear-btn-top {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 30px;
-  height: 30px;
-  background: transparent;
-  border: none;
-  color: var(--text-tertiary);
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.clear-btn-top:hover {
-  background: var(--bg-secondary);
-}
-
-/* === ОСНОВНОЙ КОНТЕЙНЕР === */
+/* === ОСНОВНОЙ КОНТЕЙНЕР (адаптивная сетка) === */
 .app-container {
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
+  flex: 1;
+  min-height: 0;
 }
 
-/* === СПИСОК КЕЙСОВ === */
+/* === СПИСОК КЕЙСОВ (адаптивная ширина) === */
 .case-list {
-  width: 300px;
-  min-width: 300px;
-  max-width: 300px;
+  min-width: 280px;
+  width: 30%;
+  max-width: 360px;
   background: var(--bg-card);
   border-radius: var(--radius-lg);
   border: 0.5px solid var(--separator);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-lg);
   height: calc(100vh - 180px);
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   position: relative;
 }
 
+/* === ШАПКА СПИСКА — заголовок, поиск, пагинация === */
 .case-list-header {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   padding: 14px 16px;
   border-bottom: 0.5px solid var(--separator);
   background: var(--bg-card);
@@ -268,26 +232,32 @@ html.dark body {
   z-index: 2;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  transition: background var(--transition);
 }
 
 .case-list-header h3 {
   font-size: 15px;
   font-weight: 600;
   color: var(--text-primary);
+  margin-bottom: 8px;
 }
 
-/* === ПОИСК В ШАПКЕ СПИСКА === */
+/* === ПОИСК И ПАГИНАЦИЯ — блок под заголовком === */
+.search-and-pagination {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 0.5px solid var(--separator);
+  align-items: center;
+}
+
+/* === ПОИСК В ШАПКЕ === */
 .search-in-header {
+  position: relative;
+  width: 100%;
   display: flex;
   align-items: center;
-  background: var(--bg-card);
-  padding: 10px 16px;
-  border-bottom: 0.5px solid var(--separator);
-  position: sticky;
-  top: 44px;
-  z-index: 2;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
 }
 
 .search-input-header {
@@ -301,7 +271,7 @@ html.dark body {
   outline: none;
   background: var(--bg-primary);
   color: var(--text-primary);
-  transition: border-color 0.25s ease;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .search-input-header:focus {
@@ -331,23 +301,110 @@ html.dark body {
   color: var(--text-primary);
 }
 
+/* === ПАГИНАЦИЯ (iOS-style) === */
+.ios-pagination {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: var(--bg-secondary);
+  border: 0.5px solid var(--separator);
+  border-radius: 20px;
+  font-size: 14px;
+  user-select: none;
+  white-space: nowrap;
+  justify-content: center;
+  height: 34px;
+  margin: 0 auto;
+  box-shadow: var(--shadow);
+}
+
+.ios-pagination-arrow {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 16px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition);
+}
+
+.ios-pagination-arrow:disabled {
+  color: #c7c7cc;
+  cursor: not-allowed;
+}
+
+.ios-pagination-arrow:hover:not(:disabled) {
+  background: var(--bg-tertiary);
+}
+
+.ios-pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.ios-pagination-page {
+  width: 30px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 14px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-weight: 500;
+  transition: background var(--transition);
+}
+
+.ios-pagination-page:hover {
+  background: var(--bg-tertiary);
+}
+
+.ios-pagination-page.active {
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+}
+
+.ios-pagination-ellipsis {
+  color: var(--text-tertiary);
+  font-size: 18px;
+  margin: 0 4px;
+}
+
 /* === ПУСТОЙ РЕЗУЛЬТАТ === */
 .no-results {
   text-align: center;
   color: var(--text-tertiary);
   font-size: 14px;
-  padding: 20px;
+  padding: 40px 20px;
   font-style: italic;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* === ЭЛЕМЕНТ СПИСКА === */
 .case-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 14px 16px;
   border-bottom: 0.5px solid var(--separator);
   cursor: pointer;
   font-size: 15px;
   color: var(--text-primary);
-  transition: background var(--transition);
+  transition: background var(--transition-fast);
 }
 
 .case-item:last-child {
@@ -358,10 +415,19 @@ html.dark body {
   background: var(--bg-secondary);
 }
 
+.case-item:active {
+  background: var(--accent-active);
+  color: white;
+}
+
 .case-item.active {
   background: #007aff10;
   font-weight: 600;
   color: var(--accent);
+}
+
+.case-item-left {
+  flex: 1;
 }
 
 .case-item p {
@@ -374,19 +440,23 @@ html.dark body {
   overflow: hidden;
 }
 
-/* === ПРОСМОТР КЕЙСА === */
+/* === ПРОСМОТР КЕЙСА (гибкая ширина) === */
 .case-view {
-  flex: 1 1 300px;
+  flex: 1 1 65%;
+  min-width: 300px;
   background: var(--bg-card);
   border-radius: var(--radius-lg);
   border: 0.5px solid var(--separator);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-lg);
   overflow: auto;
   padding: 24px;
   font-size: 17px;
   -webkit-overflow-scrolling: touch;
   max-height: calc(100vh - var(--header-height) - 40px);
   transition: opacity 0.25s ease, transform 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .case-view h2 {
@@ -402,7 +472,8 @@ html.dark body {
   font-size: 15px;
   font-weight: 600;
   color: var(--text-primary);
-  margin: 24px 0 8px;
+  margin-top: 24px;
+  margin-bottom: 8px;
 }
 
 .case-view p,
@@ -423,113 +494,27 @@ html.dark body {
   margin: 4px 0;
 }
 
-.print-btn {
-  background: var(--bg-secondary);
-  border: none;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 14px;
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: background var(--transition);
-  margin-bottom: 16px;
-  font-weight: 500;
-}
-
-.print-btn:hover {
-  background: var(--accent);
-  color: white;
-}
-
+/* === ПОДСВЕТКА ТЕКСТА === */
 .highlight {
   background: var(--highlight);
   font-weight: 600;
   color: #000;
+  padding: 0;
+  border-radius: 2px;
+  line-height: inherit;
 }
 
+/* === АНИМАЦИЯ ПРОСМОТРА === */
 .fade-in {
   opacity: 1;
   transform: translateY(0);
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
 .fade-out {
   opacity: 0;
   transform: translateY(10px);
-}
-
-/* === ПАГИНАЦИЯ (iOS-style) === */
-.ios-pagination-container {
-  padding: 16px;
-  text-align: center;
-}
-
-.ios-pagination {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  background: var(--bg-secondary);
-  border: 0.5px solid var(--separator);
-  border-radius: 20px;
-  box-shadow: var(--shadow);
-  font-size: 14px;
-  user-select: none;
-}
-
-.ios-pagination-arrow {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 16px;
-  width: 30px;
-  height: 30px;
-  cursor: pointer;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.ios-pagination-arrow:disabled {
-  color: #c7c7cc;
-  cursor: not-allowed;
-}
-
-.ios-pagination-pages {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.ios-pagination-page {
-  width: 34px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  border-radius: 15px;
-  font-size: 14px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.ios-pagination-page:hover {
-  background: var(--bg-primary);
-}
-
-.ios-pagination-page.active {
-  background: var(--accent);
-  color: white;
-  font-weight: 600;
-}
-
-.ios-pagination-ellipsis {
-  color: var(--text-tertiary);
-  font-size: 18px;
-  margin: 0 4px;
+  transition: opacity 0.15s ease;
 }
 
 /* === КНОПКА "НАВЕРХ" === */
@@ -549,16 +534,22 @@ html.dark body {
   justify-content: center;
   border: none;
   cursor: pointer;
-  box-shadow: var(--shadow);
-  transition: transform 0.2s ease;
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.2s ease, background 0.2s ease;
   z-index: 1000;
 }
 
 .scroll-top:hover {
   transform: translateY(-2px);
+  background: var(--accent-hover);
 }
 
-/* === АДАПТИВНОСТЬ === */
+.scroll-top:active {
+  transform: translateY(0);
+  background: var(--accent-active);
+}
+
+/* === АДАПТИВНОСТЬ (мобильные и iPad) === */
 @media (max-width: 768px) {
   .app-container {
     flex-direction: column;
@@ -573,11 +564,13 @@ html.dark body {
     width: 100%;
     max-width: 100%;
     height: auto;
+    min-width: auto;
   }
 
   .case-view {
     width: 100%;
     font-size: 17px;
+    padding: 20px;
   }
 
   .search-input-header {
@@ -590,5 +583,73 @@ html.dark body {
     height: 26px;
     font-size: 16px;
     right: 8px;
+  }
+
+  .case-item p {
+    font-size: 13px;
+  }
+
+  .case-item {
+    padding: 12px 14px;
+  }
+
+  .case-list-header {
+    padding: 12px 14px;
+  }
+
+  .ios-pagination {
+    padding: 4px 6px;
+    font-size: 13px;
+  }
+
+  .ios-pagination-page {
+    width: 28px;
+    height: 24px;
+  }
+
+  .ios-pagination-arrow {
+    width: 28px;
+    height: 28px;
+    font-size: 15px;
+  }
+}
+
+/* === ДЕСКТОП / iPad (горизонтальный режим, большие экраны) === */
+@media (min-width: 769px) and (orientation: landscape) {
+  .case-list {
+    min-width: 300px;
+    width: 25%;
+    max-width: 400px;
+  }
+
+  .case-view {
+    flex: 1 1 70%;
+    min-width: 400px;
+    padding: 32px;
+    font-size: 18px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .app {
+    padding: 32px;
+  }
+
+  .case-list {
+    width: 22%;
+    min-width: 320px;
+  }
+
+  .case-view {
+    padding: 40px;
+    font-size: 18px;
+  }
+
+  .case-item p {
+    font-size: 14px;
+  }
+
+  .search-input-header {
+    font-size: 15px;
   }
 }
