@@ -23,9 +23,9 @@ const App = () => {
     };
 
     if (isMobileDevice()) {
-      setIsMobileAccordionOpen(false); // Свёрнут по умолчанию
+      setIsMobileAccordionOpen(false);
     } else {
-      setIsMobileAccordionOpen(true); // На десктопах и iPad — открыт
+      setIsMobileAccordionOpen(true);
     }
 
     const handleResize = () => {
@@ -117,7 +117,6 @@ const App = () => {
     setTimeout(() => {
       setSelectedCase(newCase);
       setIsAnimating(false);
-      // На мобильных — закрыть аккордеон после выбора
       if (window.innerWidth <= 768 && 'ontouchstart' in window) {
         setIsMobileAccordionOpen(false);
       }
@@ -196,6 +195,35 @@ const App = () => {
       <header className="app-header">
         <h1>Медицинские кейсы</h1>
 
+        {/* === ГЛОБАЛЬНЫЙ ПОИСК (ТОЛЬКО НА МОБИЛЬНЫХ) === */}
+        <div className="global-search-mobile">
+          <div className="search-in-header">
+            <input
+              ref={inputRef}
+              type="text"
+              placeholder="Поиск по всем кейсам..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="search-input-header"
+            />
+            {searchTerm && (
+              <button
+                onClick={() => {
+                  setSearchTerm("");
+                  setCurrentPage(1);
+                }}
+                className="clear-btn-header"
+                aria-label="Очистить поиск"
+              >
+                ×
+              </button>
+            )}
+          </div>
+        </div>
+
         <div className="stats-container">
           <div className="stats-bar">
             <span className="stat-item">
@@ -226,8 +254,8 @@ const App = () => {
 
       <div className="app-container">
         {/* === СПИСОК КЕЙСОВ === */}
-        {/* На десктопе и iPad — обычный список */}
         {window.innerWidth > 768 ? (
+          /* === ДЕСКТОП / iPad — ПОИСК ВНУТРИ СПИСКА === */
           <div className="case-list">
             <div className="case-list-header">
               <h3>
@@ -235,6 +263,7 @@ const App = () => {
               </h3>
 
               <div className="search-and-pagination">
+                {/* Поиск внутри списка (только на десктопе) */}
                 <div className="search-in-header">
                   <input
                     ref={inputRef}
@@ -261,6 +290,7 @@ const App = () => {
                   )}
                 </div>
 
+                {/* Пагинация */}
                 {!searchTerm && totalPages > 1 && (
                   <div className="ios-pagination">
                     <button
@@ -271,14 +301,12 @@ const App = () => {
                     >
                       ◀
                     </button>
-
                     <div className="ios-pagination-pages">
                       {Array.from({ length: totalPages }, (_, i) => {
                         const page = i + 1;
                         const isCurrent = page === currentPage;
                         const isNear = Math.abs(page - currentPage) <= 1;
                         const isFirstOrLast = page === 1 || page === totalPages;
-
                         if (isFirstOrLast || isNear) {
                           return (
                             <button
@@ -302,7 +330,6 @@ const App = () => {
                         return null;
                       })}
                     </div>
-
                     <button
                       onClick={nextPage}
                       disabled={currentPage === totalPages}
@@ -353,7 +380,7 @@ const App = () => {
             )}
           </div>
         ) : (
-          /* === МОБИЛЬНЫЙ АККОРДЕОН === */
+          /* === МОБИЛЬНЫЙ АККОРДЕОН (БЕЗ ПОИСКА ВНУТРИ) === */
           <div className="case-list-mobile-wrapper">
             <div className="mobile-accordion">
               <button
@@ -375,63 +402,35 @@ const App = () => {
                   overflow: 'hidden',
                 }}
               >
-                <div className="search-and-pagination">
-                  <div className="search-in-header">
-                    <input
-                      ref={inputRef}
-                      type="text"
-                      placeholder="Поиск по списку..."
-                      value={searchTerm}
-                      onChange={(e) => {
-                        setSearchTerm(e.target.value);
-                        setCurrentPage(1);
-                      }}
-                      className="search-input-header"
-                    />
-                    {searchTerm && (
-                      <button
-                        onClick={() => {
-                          setSearchTerm("");
-                          setCurrentPage(1);
-                        }}
-                        className="clear-btn-header"
-                        aria-label="Очистить поиск"
-                      >
-                        ×
-                      </button>
-                    )}
-                  </div>
-
-                  {!searchTerm && totalPages > 1 && (
-                    <div className="ios-pagination">
-                      <button onClick={prevPage} disabled={currentPage === 1} className="ios-pagination-arrow">◀</button>
-                      <div className="ios-pagination-pages">
-                        {Array.from({ length: totalPages }, (_, i) => {
-                          const page = i + 1;
-                          const isCurrent = page === currentPage;
-                          const isNear = Math.abs(page - currentPage) <= 1;
-                          const isFirstOrLast = page === 1 || page === totalPages;
-                          if (isFirstOrLast || isNear) {
-                            return (
-                              <button
-                                key={page}
-                                onClick={() => goToPage(page)}
-                                className={`ios-pagination-page ${isCurrent ? "active" : ""}`}
-                              >
-                                {page}
-                              </button>
-                            );
-                          } else if (page === currentPage - 2 || page === currentPage + 2) {
-                            return <span key={page} className="ios-pagination-ellipsis">…</span>;
-                          }
-                          return null;
-                        })}
-                      </div>
-                      <button onClick={nextPage} disabled={currentPage === totalPages} className="ios-pagination-arrow">▶</button>
+                {/* Пагинация (без поиска) */}
+                {!searchTerm && totalPages > 1 && (
+                  <div className="ios-pagination" style={{ margin: '8px 16px' }}>
+                    <button onClick={prevPage} disabled={currentPage === 1} className="ios-pagination-arrow">◀</button>
+                    <div className="ios-pagination-pages">
+                      {Array.from({ length: totalPages }, (_, i) => {
+                        const page = i + 1;
+                        const isCurrent = page === currentPage;
+                        if (page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1) {
+                          return (
+                            <button
+                              key={page}
+                              onClick={() => goToPage(page)}
+                              className={`ios-pagination-page ${isCurrent ? "active" : ""}`}
+                            >
+                              {page}
+                            </button>
+                          );
+                        } else if (page === currentPage - 2 || page === currentPage + 2) {
+                          return <span key={page} className="ios-pagination-ellipsis">…</span>;
+                        }
+                        return null;
+                      })}
                     </div>
-                  )}
-                </div>
+                    <button onClick={nextPage} disabled={currentPage === totalPages} className="ios-pagination-arrow">▶</button>
+                  </div>
+                )}
 
+                {/* Список кейсов */}
                 {!hasResults ? (
                   <p className="no-results">
                     По запросу "{searchTerm}" ничего не найдено.
