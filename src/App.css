@@ -1,4 +1,3 @@
-/* === 1. Сброс и базовые настройки для мобильных === */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -16,7 +15,7 @@ html {
 }
 
 body {
-  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: -apple-system, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: #f2f2f7;
@@ -28,30 +27,28 @@ body {
   overflow-x: hidden;
   padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0)
             env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+  position: relative;
 }
 
-/* === 2. Темизация (iOS + Android fallback) === */
+/* === ЦВЕТА (iOS) === */
 :root {
   --bg-primary: #f2f2f7;
   --bg-secondary: #e5e5ea;
   --bg-card: white;
-  --text-primary: #1c1c1e;
+  --text-primary: #000000;
   --text-secondary: #86868b;
   --text-tertiary: #8e8e93;
   --accent: #007aff;
   --accent-hover: #0071eb;
-  --border: #c6c6c8;
   --separator: #c6c6c8;
   --highlight: #fff352;
-  --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --input-height: 44px;
+  --header-height: 80px;
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
-  --input-height: 44px;
-  --header-height: 80px;
-  --footer-height: 60px;
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 html.dark {
@@ -60,14 +57,12 @@ html.dark {
   --bg-card: #1c1c1e;
   --text-primary: #ffffff;
   --text-secondary: #8e8e93;
-  --text-tertiary: #8e8e93;
+  --text-tertiary: #6e6e71;
   --accent: #0a84ff;
   --accent-hover: #0077ed;
-  --border: #3a3a3c;
   --separator: #3a3a3c;
   --highlight: #ffd60a;
-  --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.2);
-  --shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 html.dark,
@@ -76,7 +71,7 @@ html.dark body {
   color: var(--text-primary);
 }
 
-/* === 3. App Container — безопасные области и высота === */
+/* === ОСНОВНОЙ КОНТЕЙНЕР === */
 .app {
   max-width: 100vw;
   margin: 0 auto;
@@ -86,7 +81,7 @@ html.dark body {
   padding-bottom: max(20px, env(safe-area-inset-bottom));
 }
 
-/* === 4. Заголовок (с учётом notch) === */
+/* === ЗАГОЛОВОК === */
 .app-header {
   text-align: center;
   margin-bottom: 20px;
@@ -101,12 +96,12 @@ html.dark body {
   letter-spacing: -0.5px;
 }
 
-/* Статистика и тумблер */
+/* === СТАТИСТИКА === */
 .stats-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
   margin-bottom: 16px;
   font-size: 13px;
@@ -122,11 +117,14 @@ html.dark body {
 .stat-item {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   background: var(--bg-secondary);
   padding: 4px 10px;
-  border-radius: 10px;
+  border-radius: 20px;
   font-weight: 500;
+  color: var(--text-secondary);
+  font-size: 12.5px;
+  white-space: nowrap;
 }
 
 .stat-item strong {
@@ -135,11 +133,10 @@ html.dark body {
 
 .stat-found-zero {
   background: #ff3b3022 !important;
-  border: none;
   color: #ff3b30;
 }
 
-/* === 5. Тумблер темы (iOS + Android fallback) === */
+/* === ПЕРЕКЛЮЧЕНИЕ ТЕМЫ === */
 .theme-toggle-container {
   display: flex;
   align-items: center;
@@ -189,15 +186,15 @@ html.dark body {
   background: #ffffff;
 }
 
-/* === 6. Поиск (адаптив) === */
+/* === ГЛОБАЛЬНЫЙ ПОИСК === */
 .search-bar-top {
   max-width: 500px;
   margin: 0 auto 20px;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: var(--shadow-light);
   background: white;
-  border: 0.5px solid var(--border);
+  border: 0.5px solid var(--separator);
+  box-shadow: var(--shadow);
   position: relative;
 }
 
@@ -210,7 +207,6 @@ html.dark body {
   outline: none;
   background: transparent;
   color: var(--text-primary);
-  -webkit-appearance: none;
 }
 
 .search-input-top::placeholder {
@@ -237,36 +233,105 @@ html.dark body {
 
 .clear-btn-top:hover {
   background: var(--bg-secondary);
-  color: var(--text-primary);
 }
 
-/* === 7. Макет и карточки === */
+/* === ОСНОВНОЙ КОНТЕЙНЕР === */
 .app-container {
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
-  min-height: 300px;
 }
 
-.case-list,
-.case-view {
-  flex: 1 1 300px;
+/* === СПИСОК КЕЙСОВ === */
+.case-list {
+  width: 300px;
   min-width: 300px;
+  max-width: 300px;
   background: var(--bg-card);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-light);
-  overflow: hidden;
-  border: 0.5px solid var(--border);
+  border: 0.5px solid var(--separator);
+  box-shadow: var(--shadow);
+  height: calc(100vh - 180px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
 }
 
-.case-list h3 {
+.case-list-header {
+  display: flex;
+  align-items: center;
   padding: 14px 16px;
-  font-size: 15px;
-  color: var(--text-secondary);
-  font-weight: 600;
   border-bottom: 0.5px solid var(--separator);
+  background: var(--bg-card);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
+.case-list-header h3 {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* === ПОИСК В ШАПКЕ СПИСКА === */
+.search-in-header {
+  display: flex;
+  align-items: center;
+  background: var(--bg-card);
+  padding: 10px 16px;
+  border-bottom: 0.5px solid var(--separator);
+  position: sticky;
+  top: 44px;
+  z-index: 2;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.search-input-header {
+  flex: 1;
+  width: 100%;
+  height: 36px;
+  padding: 0 36px 0 12px;
+  font-size: 15px;
+  border: 0.5px solid var(--separator);
+  border-radius: 18px;
+  outline: none;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color 0.25s ease;
+}
+
+.search-input-header:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.clear-btn-header {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.clear-btn-header:hover {
+  color: var(--text-primary);
+}
+
+/* === ПУСТОЙ РЕЗУЛЬТАТ === */
 .no-results {
   text-align: center;
   color: var(--text-tertiary);
@@ -275,6 +340,7 @@ html.dark body {
   font-style: italic;
 }
 
+/* === ЭЛЕМЕНТ СПИСКА === */
 .case-item {
   padding: 14px 16px;
   border-bottom: 0.5px solid var(--separator);
@@ -308,13 +374,19 @@ html.dark body {
   overflow: hidden;
 }
 
-/* === 8. Просмотр кейса === */
+/* === ПРОСМОТР КЕЙСА === */
 .case-view {
-  max-height: calc(100vh - var(--header-height) - 40px);
+  flex: 1 1 300px;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 0.5px solid var(--separator);
+  box-shadow: var(--shadow);
   overflow: auto;
   padding: 24px;
   font-size: 17px;
   -webkit-overflow-scrolling: touch;
+  max-height: calc(100vh - var(--header-height) - 40px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
 .case-view h2 {
@@ -339,6 +411,7 @@ html.dark body {
   font-size: 17px;
   color: var(--text-primary);
   margin: 8px 0;
+  line-height: 1.5;
 }
 
 .case-view ul,
@@ -368,17 +441,10 @@ html.dark body {
   color: white;
 }
 
-/* === 9. Подсветка и анимации === */
 .highlight {
   background: var(--highlight);
   font-weight: 600;
   color: #000;
-  padding: 0;
-  border-radius: 2px;
-}
-
-.case-view {
-  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
 .fade-in {
@@ -391,7 +457,7 @@ html.dark body {
   transform: translateY(10px);
 }
 
-/* === 10. iOS-пагинация === */
+/* === ПАГИНАЦИЯ (iOS-style) === */
 .ios-pagination-container {
   padding: 16px;
   text-align: center;
@@ -403,9 +469,9 @@ html.dark body {
   gap: 6px;
   padding: 6px 10px;
   background: var(--bg-secondary);
-  border: 0.5px solid var(--border);
+  border: 0.5px solid var(--separator);
   border-radius: 20px;
-  box-shadow: var(--shadow-light);
+  box-shadow: var(--shadow);
   font-size: 14px;
   user-select: none;
 }
@@ -427,10 +493,6 @@ html.dark body {
 .ios-pagination-arrow:disabled {
   color: #c7c7cc;
   cursor: not-allowed;
-}
-
-.ios-pagination-arrow:hover:not(:disabled) {
-  background: var(--bg-primary);
 }
 
 .ios-pagination-pages {
@@ -470,7 +532,7 @@ html.dark body {
   margin: 0 4px;
 }
 
-/* === 11. Кнопка "Наверх" — с учётом безопасных зон === */
+/* === КНОПКА "НАВЕРХ" === */
 .scroll-top {
   position: fixed;
   bottom: calc(20px + env(safe-area-inset-bottom));
@@ -490,14 +552,13 @@ html.dark body {
   box-shadow: var(--shadow);
   transition: transform 0.2s ease;
   z-index: 1000;
-  will-change: transform;
 }
 
 .scroll-top:hover {
   transform: translateY(-2px);
 }
 
-/* === 12. Адаптивность (все устройства) === */
+/* === АДАПТИВНОСТЬ === */
 @media (max-width: 768px) {
   .app-container {
     flex-direction: column;
@@ -508,103 +569,26 @@ html.dark body {
     padding-bottom: max(16px, env(safe-area-inset-bottom));
   }
 
+  .case-list {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+  }
+
   .case-view {
-    max-height: calc(100vh - var(--header-height) - 60px);
-    padding: 16px;
+    width: 100%;
     font-size: 17px;
   }
 
-  .search-bar-top {
-    max-width: 100%;
+  .search-input-header {
+    font-size: 14px;
+    padding: 0 32px 0 10px;
   }
 
-  .case-item p {
-    font-size: 13px;
-  }
-
-  .ios-pagination {
-    padding: 6px 8px;
-    gap: 4px;
-  }
-
-  .ios-pagination-page {
-    width: 30px;
-    height: 28px;
-    font-size: 13px;
-  }
-
-  .ios-pagination-arrow {
-    width: 28px;
-    height: 28px;
-  }
-
-  .scroll-top {
-    bottom: calc(16px + env(safe-area-inset-bottom));
-    right: 12px;
-    width: 40px;
-    height: 40px;
-  }
-}
-
-/* === 13. Печать — универсальная === */
-@media print {
-  body {
-    background: white !important;
-    -webkit-print-color-adjust: exact;
-    color: black;
-  }
-
-  .app {
-    padding: 0 !important;
-    margin: 0;
-  }
-
-  .app-header,
-  .search-bar-top,
-  .ios-pagination-container,
-  .print-btn,
-  .scroll-top,
-  .case-list {
-    display: none !important;
-  }
-
-  .app-container {
-    display: block;
-  }
-
-  .case-view {
-    box-shadow: none;
-    padding: 20px;
-    max-height: none;
-    border: none;
-    font-size: 14pt;
-    line-height: 1.6;
-    width: 100%;
-    margin: 0;
-    color: black;
-  }
-
-  .case-view h2,
-  .case-view h4 {
-    color: black;
-    border-color: #000;
-  }
-
-  .highlight {
-    background-color: #fff352;
-    font-weight: bold;
-    color: black;
-  }
-
-  @page {
-    margin: 1.5cm;
-    size: A4 portrait;
-  }
-}
-
-/* === 14. Для старых Android === */
-@supports (-webkit-appearance: none) or (-moz-appearance: none) {
-  .search-input-top {
+  .clear-btn-header {
+    width: 26px;
+    height: 26px;
     font-size: 16px;
+    right: 8px;
   }
 }

@@ -15,7 +15,23 @@ const App = () => {
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
 
-  // Проверка предпочтений системы и localStorage
+  // Удаление preloader после загрузки
+  useEffect(() => {
+    if (document.body.classList.contains("loaded")) return;
+
+    document.body.classList.add("loaded");
+
+    const timer = setTimeout(() => {
+      const preloader = document.getElementById("preloader");
+      if (preloader) {
+        preloader.remove();
+      }
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Проверка темы при загрузке
   useEffect(() => {
     const saved = localStorage.getItem("darkMode");
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -25,6 +41,10 @@ const App = () => {
 
     if (enabled) {
       document.documentElement.classList.add("dark");
+      document.body.classList.add("dark-mode");
+    } else {
+      document.documentElement.classList.remove("dark");
+      document.body.classList.remove("dark-mode");
     }
   }, []);
 
@@ -36,8 +56,10 @@ const App = () => {
 
     if (newMode) {
       document.documentElement.classList.add("dark");
+      document.body.classList.add("dark-mode");
     } else {
       document.documentElement.classList.remove("dark");
+      document.body.classList.remove("dark-mode");
     }
   };
 
@@ -81,7 +103,7 @@ const App = () => {
     setTimeout(() => {
       setSelectedCase(newCase);
       setIsAnimating(false);
-    }, 150); // Задержка для срабатывания анимации
+    }, 150);
   };
 
   // Горячие клавиши
@@ -135,7 +157,7 @@ const App = () => {
     return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   };
 
-  // Свайп на мобильных
+  // Свайп для пагинации
   const handleTouchStart = (e) => {
     touchStartX.current = e.touches[0].clientX;
   };
@@ -167,7 +189,6 @@ const App = () => {
       <header className="app-header">
         <h1>Медицинские кейсы</h1>
 
-        {/* Статистика и тумблер */}
         <div className="stats-container">
           <div className="stats-bar">
             <span className="stat-item">
@@ -184,7 +205,6 @@ const App = () => {
             )}
           </div>
 
-          {/* Тумблер iOS-style */}
           <div className="theme-toggle-container">
             <span className="theme-label">☀️</span>
             <button
@@ -198,7 +218,6 @@ const App = () => {
           </div>
         </div>
 
-        {/* Поиск */}
         <div className="search-bar-top">
           <input
             ref={inputRef}
@@ -227,11 +246,39 @@ const App = () => {
       </header>
 
       <div className="app-container">
-        {/* Список кейсов */}
+        {/* Список кейсов — всегда открыт */}
         <div className="case-list">
-          <h3>
-            Кейсы {searchTerm && `(${filteredCases.length} найдено)`}
-          </h3>
+          <div className="case-list-header">
+            <h3>
+              Кейсы {searchTerm && `(${filteredCases.length} найдено)`}
+            </h3>
+          </div>
+
+          {/* Поиск в шапке списка */}
+          <div className="search-in-header">
+            <input
+              type="text"
+              placeholder="Поиск по списку..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="search-input-header"
+            />
+            {searchTerm && (
+              <button
+                onClick={() => {
+                  setSearchTerm("");
+                  setCurrentPage(1);
+                }}
+                className="clear-btn-header"
+                aria-label="Очистить поиск"
+              >
+                ×
+              </button>
+            )}
+          </div>
 
           {!hasResults ? (
             <p className="no-results">
@@ -260,7 +307,7 @@ const App = () => {
                     )}
                   </p>
                   {!isMatch && (
-                    <small style={{ color: "#e53e3e", fontSize: "12px" }}>
+                    <small style={{ color: "#e53e30", fontSize: "12px" }}>
                       не соответствует
                     </small>
                   )}
@@ -269,7 +316,6 @@ const App = () => {
             })
           )}
 
-          {/* iOS-стиль пагинация */}
           {totalPages > 1 && (
             <div className="ios-pagination-container">
               <div className="ios-pagination">
@@ -315,15 +361,11 @@ const App = () => {
                   ▶
                 </button>
               </div>
-
-              <p className="pagination-info">
-                Страница {currentPage} из {totalPages} • Показано {currentCases.length} из {filteredCases.length}
-              </p>
             </div>
           )}
         </div>
 
-        {/* Просмотр кейса с анимацией */}
+        {/* Просмотр кейса */}
         <div className={`case-view ${isAnimating ? "fade-out" : "fade-in"}`}>
           <h2>Кейс {selectedCase.id}</h2>
 
@@ -385,7 +427,6 @@ const App = () => {
         </div>
       </div>
 
-      {/* Кнопка "Наверх" */}
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         className="scroll-top"
