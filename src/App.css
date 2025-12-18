@@ -1,0 +1,621 @@
+/* === Цветовая схема и переменные === */
+:root {
+  --bg-primary: #fafafa;
+  --bg-secondary: #f7fafc;
+  --text-primary: #2d3748;
+  --text-secondary: #4a5568;
+  --border: #e2e8f0;
+  --accent: #2b6cb0;
+  --accent-hover: #2c5282;
+  --card-bg: white;
+  --highlight: #fff352;
+  --danger: #c53030;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-hover: 0 2px 8px rgba(43, 108, 176, 0.15);
+  --transition: all 0.2s ease;
+}
+
+html.dark {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --text-primary: #e2e8f0;
+  --text-secondary: #a0aec0;
+  --border: #4a5568;
+  --accent: #63b3ed;
+  --accent-hover: #429ed0;
+  --card-bg: #242424;
+  --highlight: #f6e05e;
+  --danger: #fc8181;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-hover: 0 2px 8px rgba(99, 179, 237, 0.2);
+  --transition: all 0.3s ease;
+}
+
+html.dark,
+html.dark body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* === Base === */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* === App === */
+.app {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  min-height: 100vh;
+}
+
+/* === Header === */
+.app-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.app-header h1 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #1a365d;
+  margin-bottom: 8px;
+}
+
+/* Статистика и тумблер */
+.stats-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.stats-bar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-secondary);
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-weight: 500;
+}
+
+.stat-item strong {
+  color: var(--accent);
+}
+
+.stat-found-zero {
+  background: #fff5f5 !important;
+  border-color: #fc8181 !important;
+  color: var(--danger);
+}
+
+/* === Поиск === */
+.search-bar-top {
+  display: flex;
+  max-width: 600px;
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  transition: box-shadow 0.2s ease;
+}
+
+.search-bar-top:focus-within {
+  box-shadow: var(--shadow-hover);
+}
+
+.search-input-top {
+  flex: 1;
+  padding: 14px 16px;
+  font-size: 15px;
+  border: none;
+  outline: none;
+  background: white;
+  color: var(--text-primary);
+}
+
+.search-input-top::placeholder {
+  color: var(--text-secondary);
+}
+
+.clear-btn-top {
+  background: var(--bg-secondary);
+  border: none;
+  color: var(--text-secondary);
+  width: 48px;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+}
+
+.clear-btn-top:hover {
+  background: var(--border);
+  color: var(--text-primary);
+}
+
+/* === Layout === */
+.app-container {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.case-list,
+.case-view {
+  border-radius: 12px;
+  background: var(--card-bg);
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+
+.case-list {
+  flex: 1;
+  min-width: 300px;
+  padding: 20px;
+}
+
+.case-view {
+  flex: 2;
+  min-width: 400px;
+  padding: 32px;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+/* === Список кейсов === */
+.case-list h3 {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  font-weight: 500;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+}
+
+.no-results {
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin: 20px 0;
+  font-size: 14px;
+}
+
+.case-item {
+  padding: 14px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.case-item:last-child {
+  border-bottom: none;
+}
+
+.case-item:hover {
+  background: var(--bg-secondary);
+}
+
+.case-item.active {
+  background: #ebf8ff;
+  border: 1px solid #bee3f8;
+  font-weight: 600;
+}
+
+.case-item p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* === Просмотр кейса === */
+.case-view h2 {
+  font-size: 22px;
+  color: #1a365d;
+  margin-bottom: 12px;
+  font-weight: 600;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.case-view h4 {
+  font-size: 15px;
+  color: var(--text-primary);
+  margin: 24px 0 8px;
+  font-weight: 600;
+}
+
+.case-view p,
+.case-view ul,
+.case-view ol {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin: 6px 0;
+}
+
+.case-view ul,
+.case-view ol {
+  padding-left: 18px;
+}
+
+.case-view li {
+  margin: 4px 0;
+}
+
+.print-btn {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: var(--transition);
+  margin-bottom: 16px;
+}
+
+.print-btn:hover {
+  background: var(--border);
+}
+
+/* === Подсветка === */
+.highlight {
+  background: var(--highlight);
+  font-weight: 600;
+  padding: 0;
+  border-radius: 2px;
+}
+
+/* === Тумблер темы (iOS-style) === */
+.theme-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.theme-label {
+  font-size: 16px;
+  opacity: 0.9;
+  width: 20px;
+  text-align: center;
+}
+
+.theme-toggle-switch {
+  position: relative;
+  width: 50px;
+  height: 26px;
+  background: #e2e8f0;
+  border-radius: 15px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  outline: none;
+}
+
+.theme-toggle-switch.light {
+  background: #e2e8f0;
+}
+
+.theme-toggle-switch.dark {
+  background: #4a5568;
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  background-image: radial-gradient(circle, #f3f4f6, #e5e7eb);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, background 0.3s;
+}
+
+.theme-toggle-switch.dark .toggle-thumb {
+  transform: translateX(24px);
+  background: #f7fafc;
+}
+
+.theme-toggle-switch:hover .toggle-thumb {
+  background: #f8fafc;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .theme-toggle-switch,
+  .toggle-thumb {
+    transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+}
+
+/* === iOS-стиль Пагинация === */
+.ios-pagination-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.ios-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  font-size: 14px;
+  color: var(--text-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: var(--transition);
+}
+
+.ios-pagination:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.ios-pagination-arrow {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 16px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.ios-pagination-arrow:disabled {
+  color: #cbd5e0;
+  cursor: not-allowed;
+}
+
+.ios-pagination-arrow:hover:not(:disabled) {
+  background: var(--border);
+}
+
+.ios-pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.ios-pagination-page {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.ios-pagination-page:hover {
+  background: var(--border);
+  color: var(--text-primary);
+}
+
+.ios-pagination-page.active {
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.ios-pagination-ellipsis {
+  color: var(--text-secondary);
+  font-size: 18px;
+  user-select: none;
+  margin: 0 2px;
+}
+
+/* === Анимации появления кейса === */
+.case-view {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fade-out {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* === Кнопка "Наверх" === */
+.scroll-top {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: var(--transition);
+  z-index: 10;
+}
+
+.scroll-top:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* === Адаптивность === */
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+  }
+
+  .app {
+    padding: 16px;
+  }
+
+  .case-view {
+    max-height: 75vh;
+    padding: 20px;
+  }
+
+  .app-header h1 {
+    font-size: 24px;
+  }
+
+  .search-bar-top {
+    max-width: 100%;
+  }
+
+  .case-item p {
+    font-size: 13px;
+  }
+
+  .theme-toggle-container {
+    gap: 6px;
+    font-size: 13px;
+  }
+
+  .theme-label {
+    font-size: 15px;
+    width: 18px;
+  }
+
+  .theme-toggle-switch {
+    width: 46px;
+    height: 24px;
+  }
+
+  .toggle-thumb {
+    width: 18px;
+    height: 18px;
+    top: 3px;
+  }
+
+  .theme-toggle-switch.dark .toggle-thumb {
+    transform: translateX(22px);
+  }
+
+  /* iOS Pagination Mobile */
+  .ios-pagination {
+    padding: 6px 10px;
+    gap: 4px;
+    border-radius: 14px;
+  }
+
+  .ios-pagination-arrow {
+    width: 26px;
+    height: 26px;
+    font-size: 15px;
+  }
+
+  .ios-pagination-page {
+    width: 28px;
+    height: 28px;
+    font-size: 13px;
+  }
+
+  .ios-pagination-ellipsis {
+    font-size: 16px;
+  }
+}
+
+/* === Печать === */
+@media print {
+  body {
+    background: white !important;
+    color: black;
+  }
+
+  .app {
+    padding: 0;
+  }
+
+  .app-header,
+  .search-bar-top,
+  .ios-pagination-container,
+  .print-btn,
+  .scroll-top,
+  .case-list {
+    display: none !important;
+  }
+
+  .app-container {
+    display: block;
+  }
+
+  .case-view {
+    box-shadow: none;
+    padding: 0;
+    max-height: none;
+    border: none;
+    font-size: 12pt;
+    line-height: 1.6;
+  }
+
+  .case-view h2,
+  .case-view h4 {
+    color: black;
+    border-color: #000;
+  }
+
+  .highlight {
+    background-color: #fff352;
+    font-weight: bold;
+  }
+
+  @page {
+    margin: 1.5cm;
+  }
+}
