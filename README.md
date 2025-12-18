@@ -28,5 +28,5 @@
 2. Клонируйте репозиторий:
 
 ```bash
-git clone https://github.com/ваш-репозиторий/medical-cases-app.git
+git clone https://github.com/dfr8938/medical-cases-app.git
 cd medical-cases-app
