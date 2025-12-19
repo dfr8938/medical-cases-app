@@ -1,4 +1,3 @@
-/* === СБРОС И БАЗОВЫЕ СТИЛИ === */
 *,
 *::before,
 *::after {
@@ -38,7 +37,7 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
-/* === ЦВЕТА И ПЕРЕМЕННЫЕ (iOS-стиль, с fallback) === */
+/* === ЦВЕТА И ПЕРЕМЕННЫЕ (iOS-стиль) === */
 :root {
   --bg-primary: #f2f2f7;
   --bg-secondary: #e5e5ea;
@@ -81,7 +80,7 @@ html.dark {
   --highlight: #ffd60a;
 }
 
-/* === ФИКС ДЛЯ СТАРЫХ БРАУЗЕРОВ (fallback) === */
+/* === ФИКС ДЛЯ СТАРЫХ БРАУЗЕРОВ === */
 @media not all and (min-resolution: 0.001dpcm) {
   @supports (-webkit-appearance: none) and (stroke-color: transparent) {
     :root {
@@ -410,6 +409,10 @@ html.dark {
   transition: background var(--transition);
 }
 
+.ios-pagination-page:hover {
+  background: var(--bg-tertiary);
+}
+
 .ios-pagination-page.active {
   background: var(--accent);
   color: white;
@@ -710,10 +713,6 @@ html.dark {
     padding: 12px 14px;
   }
 
-  .case-item p {
-    line-height: 1.4;
-  }
-
   .case-list-header {
     padding: 12px 14px;
   }
@@ -783,7 +782,7 @@ html.dark {
   }
 }
 
-/* === ДЛЯ СЛАБОВИДЯЩИХ (a11y) === */
+/* === ДОСТУПНОСТЬ === */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -798,4 +797,96 @@ html.dark {
     --separator: #000;
     --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   }
+}
+
+/* === iOS-STYLE PRELOADER === */
+#preloader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.5s ease;
+}
+
+.ios-loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 32px;
+  background: var(--bg-secondary);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  border: 0.5px solid var(--separator);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  max-width: 280px;
+  text-align: center;
+}
+
+.ios-loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.ios-loader-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid transparent;
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: ios-spin 0.8s linear infinite;
+}
+
+@keyframes ios-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.ios-loader-text {
+  font-size: 15px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin: 0;
+  opacity: 0.8;
+}
+
+/* === Тёмная тема — Preloader === */
+html.dark .ios-loader-container {
+  background: rgba(28, 28, 30, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-color: #3a3a3c;
+}
+
+html.dark .ios-loader-text {
+  color: #8e8e93;
+}
+
+/* === Адаптивность — Preloader === */
+@media (max-width: 480px) {
+  .ios-loader-container {
+    padding: 20px 24px;
+    border-radius: 14px;
+    max-width: 260px;
+  }
+
+  .ios-loader-text {
+    font-size: 14px;
+  }
+}
+
+/* === Анимация исчезновения Preloader === */
+body.loaded #preloader {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
 }

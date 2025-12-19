@@ -1,0 +1,107 @@
+{
+  "name": "Медицинские кейсы",
+  "short_name": "Кейсы",
+  "description": "Интерактивные медицинские кейсы для студентов и медработников",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f2f2f7",
+  "theme_color": "#007aff",
+  "orientation": "portrait-primary",
+  "lang": "ru-RU",
+  "scope": "/",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/screenshot-1.png",
+      "type": "image/png",
+      "sizes": "1170x2532",
+      "form_factor": "mobile",
+      "label": "Главная страница — список кейсов"
+    },
+    {
+      "src": "screenshots/screenshot-2.png",
+      "type": "image/png",
+      "sizes": "1170x2532",
+      "form_factor": "mobile",
+      "label": "Просмотр кейса и поиск"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Новый кейс",
+      "short_name": "Новый",
+      "description": "Открыть первый кейс",
+      "url": "./?case=new",
+      "icons": [
+        {
+          "src": "icons/shortcut-plus.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Темная тема",
+      "short_name": "Темно",
+      "description": "Переключить тему",
+      "url": "./?theme=dark",
+      "icons": [
+        {
+          "src": "icons/shortcut-moon.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "categories": [
+    "education",
+    "health",
+    "medical",
+    "utilities"
+  ],
+  "dir": "ltr",
+  "related_applications": []
+}

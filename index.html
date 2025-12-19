@@ -1,82 +1,95 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" class="no-js">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#007aff" />
-    <meta name="description" content="Медицинские кейсы для студентов и медперсонала — обучение, поиск, темы, iOS-стиль." />
+
+    <!-- Запрет масштабирования -->
     <meta name="format-detection" content="telephone=no" />
+    <meta name="format-detection" content="address=no" />
+    <meta name="format-detection" content="email=no" />
 
-    <title>Медицинские кейсы</title>
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="%PUBLIC_URL%/favicon-32x32.png" sizes="32x32" />
-    <link rel="icon" type="image/png" href="%PUBLIC_URL%/favicon-16x16.png" sizes="16x16" />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-touch-icon.png" />
-
-    <!-- iOS Standalone Mode -->
+    <!-- PWA: Установка на экран "Домой" -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="MedCases" />
+    <meta name="apple-mobile-web-app-title" content="МедКейсы" />
 
-    <!-- Preconnect -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Заголовок и описание -->
+    <title>МедКейсы — Клинические ситуации</title>
+    <meta name="description" content="Обучающее приложение для студентов-медиков и медсестёр. Просмотр, поиск и анализ клинических кейсов." />
 
-    <!-- Preloader Styles -->
-    <style>
-      #preloader {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: #f2f2f7;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        transition: opacity 0.5s ease-out, visibility 0s 0.5s;
-        font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
-      }
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="%PUBLIC_URL%/favicon.ico" sizes="32x32" />
+    <link rel="icon" type="image/png" href="%PUBLIC_URL%/icons/icon-192.png" sizes="192x192" />
 
-      .dark-mode #preloader {
-        background: #000000;
-      }
+    <!-- Apple Touch Icon (для установки на iPhone) -->
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/icons/apple-touch-icon.png" />
 
-      .spinner {
-        width: 50px;
-        height: 50px;
-        border: 4px solid #e5e5ea;
-        border-top: 4px solid #007aff;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-      }
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
 
-      .dark-mode .spinner {
-        border: 4px solid #3a3a3c;
-        border-top: 4px solid #0a84ff;
-      }
+    <!-- Предзагрузка шрифтов (опционально) -->
+    <link rel="preload" href="%PUBLIC_URL%/fonts/SF-Pro-Text-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
 
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
+    <!-- Open Graph / Социальные сети -->
+    <meta property="og:title" content="МедКейсы" />
+    <meta property="og:description" content="Клинические ситуации для обучения медицинских работников" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://ваш-сайт.ru" />
+    <meta property="og:image" content="%PUBLIC_URL%/og-image.png" />
 
-      .loaded #preloader {
-        opacity: 0;
-        visibility: hidden;
-      }
-    </style>
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="МедКейсы" />
+    <meta name="twitter:description" content="Адаптивный тренажёр клинических ситуаций" />
+    <meta name="twitter:image" content="%PUBLIC_URL%/og-image.png" />
+
+    <!-- Запрет автозаполнения (для чистоты интерфейса) -->
+    <meta name="password-autocomplete" content="off" />
   </head>
+
   <body>
+    <!-- iOS-Style Preloader -->
     <div id="preloader">
-      <div style="text-align: center;">
-        <div class="spinner"></div>
-        <p style="color: #8e8e93; font-size: 14px; margin-top: 16px;">Загрузка кейсов...</p>
+      <div class="ios-loader-container">
+        <div class="ios-loader-content">
+          <div class="ios-loader-spinner"></div>
+          <p class="ios-loader-text">Загрузка кейсов...</p>
+        </div>
       </div>
     </div>
+
+    <!-- Корневой элемент React -->
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+
+    <!-- Яндекс.Метрика (опционально) -->
+    <!--
+    <script type="text/javascript">
+      (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+      m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+      (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+      ym(XXXXXX, "init", {
+           clickmap:true,
+           trackLinks:true,
+           accurateTrackBounce:true,
+           webvisor:true
+      });
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/XXXXXX" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    -->
+
+    <!-- Google Analytics (опционально) -->
+    <!--
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
+    -->
   </body>
 </html>
