@@ -1,95 +1,49 @@
 <!DOCTYPE html>
-<html lang="ru" class="no-js">
+<html lang="ru">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#007aff" />
+    <meta name="description" content="Медицинские кейсы — обучение сестринскому уходу" />
 
-    <!-- Запрет масштабирования -->
-    <meta name="format-detection" content="telephone=no" />
-    <meta name="format-detection" content="address=no" />
-    <meta name="format-detection" content="email=no" />
+    <title>Медицинские кейсы</title>
 
-    <!-- PWA: Установка на экран "Домой" -->
+    <!-- iOS PWA -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="МедКейсы" />
+    <meta name="apple-mobile-web-app-title" content="Кейсы" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/icon-192x192.png" />
 
-    <!-- Заголовок и описание -->
-    <title>МедКейсы — Клинические ситуации</title>
-    <meta name="description" content="Обучающее приложение для студентов-медиков и медсестёр. Просмотр, поиск и анализ клинических кейсов." />
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="%PUBLIC_URL%/favicon.ico" sizes="32x32" />
-    <link rel="icon" type="image/png" href="%PUBLIC_URL%/icons/icon-192.png" sizes="192x192" />
-
-    <!-- Apple Touch Icon (для установки на iPhone) -->
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/icons/apple-touch-icon.png" />
-
-    <!-- PWA Manifest -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-
-    <!-- Предзагрузка шрифтов (опционально) -->
-    <link rel="preload" href="%PUBLIC_URL%/fonts/SF-Pro-Text-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
-
-    <!-- Open Graph / Социальные сети -->
-    <meta property="og:title" content="МедКейсы" />
-    <meta property="og:description" content="Клинические ситуации для обучения медицинских работников" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://ваш-сайт.ru" />
-    <meta property="og:image" content="%PUBLIC_URL%/og-image.png" />
-
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="МедКейсы" />
-    <meta name="twitter:description" content="Адаптивный тренажёр клинических ситуаций" />
-    <meta name="twitter:image" content="%PUBLIC_URL%/og-image.png" />
-
-    <!-- Запрет автозаполнения (для чистоты интерфейса) -->
-    <meta name="password-autocomplete" content="off" />
   </head>
 
   <body>
-    <!-- iOS-Style Preloader -->
+    <!-- Прелоадер -->
     <div id="preloader">
       <div class="ios-loader-container">
-        <div class="ios-loader-content">
-          <div class="ios-loader-spinner"></div>
-          <p class="ios-loader-text">Загрузка кейсов...</p>
-        </div>
+        <div class="ios-loader-spinner"></div>
+        <p class="ios-loader-text">Загрузка кейсов...</p>
       </div>
     </div>
 
-    <!-- Корневой элемент React -->
+    <!-- React root -->
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
 
-    <!-- Яндекс.Метрика (опционально) -->
-    <!--
-    <script type="text/javascript">
-      (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-      m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
-      (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+    <!-- Резервное удаление прелоадера на случай зависания -->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const timeout = setTimeout(() => {
+          const preloader = document.getElementById("preloader");
+          if (preloader) {
+            preloader.remove();
+            console.warn("Прелоадер удалён принудительно (таймаут)");
+          }
+        }, 8000); // 8 секунд
 
-      ym(XXXXXX, "init", {
-           clickmap:true,
-           trackLinks:true,
-           accurateTrackBounce:true,
-           webvisor:true
+        // Очистка при нормальной загрузке
+        window.addEventListener("beforeunload", () => clearTimeout(timeout));
       });
     </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/XXXXXX" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-    -->
-
-    <!-- Google Analytics (опционально) -->
-    <!--
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-XXXXXXXXXX');
-    </script>
-    -->
   </body>
 </html>

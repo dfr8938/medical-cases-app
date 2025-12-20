@@ -43,7 +43,7 @@ const App = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Темная тема с защитой от ошибок localStorage
+  // Темная тема
   useEffect(() => {
     let saved;
     try {
@@ -113,7 +113,7 @@ const App = () => {
   const nextPage = () => currentPage < totalPages && goToPage(currentPage + 1);
   const prevPage = () => currentPage > 1 && goToPage(currentPage - 1);
 
-  // Смена кейса с анимацией и скроллом
+  // Смена кейса с анимацией
   const changeCaseWithAnimation = (newCase) => {
     if (!newCase || selectedCase?.id === newCase.id) return;
     setIsAnimating(true);
@@ -186,26 +186,29 @@ const App = () => {
   const handleTouchEnd = () => {
     const diff = touchStartX.current - touchEndX.current;
     const threshold = 50;
-    if (Math.abs(diff) < threshold) {
-      touchEndX.current = 0;
-      return;
-    }
+    if (Math.abs(diff) < threshold) return;
     if (diff > 0 && currentPage < totalPages) {
       nextPage();
     } else if (diff < 0 && currentPage > 1) {
       prevPage();
     }
-    touchEndX.current = 0;
   };
 
-  // Обновление высоты аккордеона
+  // Обновление высоты аккордеона — ✅ исправлено
   useEffect(() => {
-    if (isMobileAccordionOpen && caseListPanelRef.current) {
-      caseListPanelRef.current.style.maxHeight = `${caseListPanelRef.current.scrollHeight + 20}px`;
-    } else if (caseListPanelRef.current) {
-      caseListPanelRef.current.style.maxHeight = '0px';
+    if (!caseListPanelRef.current) return;
+    const panel = caseListPanelRef.current;
+
+    if (isMobileAccordionOpen) {
+      // Даем браузеру время отрисовать содержимое
+      const frame = requestAnimationFrame(() => {
+        panel.style.maxHeight = `${panel.scrollHeight + 20}px`;
+      });
+      return () => cancelAnimationFrame(frame);
+    } else {
+      panel.style.maxHeight = '0px';
     }
-  }, [isMobileAccordionOpen, filteredCases, currentPage]);
+  }, [isMobileAccordionOpen]);
 
   // Рендер списка кейсов
   const renderCaseList = () => (
@@ -323,7 +326,6 @@ const App = () => {
     </>
   );
 
-  // Если нет кейсов
   if (!selectedCase) {
     return (
       <div className="app">
@@ -376,7 +378,7 @@ const App = () => {
           </div>
         )}
 
-        <div className="stats-container">
+        <div className="stats-container" aria-live="polite">
           <div className="stats-bar">
             <span className="stat-item">
               📁 <strong>{base.length}</strong> кейс(а/ов)
@@ -427,6 +429,7 @@ const App = () => {
                   opacity: isMobileAccordionOpen ? 1 : 0,
                   overflow: "hidden",
                   transition: "max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease",
+                  maxHeight: '0px' // будет обновлено через useEffect
                 }}
               >
                 <div>
