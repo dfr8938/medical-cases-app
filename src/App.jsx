@@ -12,14 +12,12 @@ const App = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [isMobileAccordionOpen, setIsMobileAccordionOpen] = useState(false);
   const [isAnimating, setIsAnimating] = useState(false);
-  const [swipeOffset, setSwipeOffset] = useState(0); // для UX-сдвига
 
   const itemsPerPage = 3;
   const inputRef = useRef();
   const caseListPanelRef = useRef();
 
   const touchStartX = useRef(0);
-  const swipeStartX = useRef(0);
   const isSwipeActive = useRef(false);
 
   // Определение мобильного устройства
@@ -180,37 +178,31 @@ const App = () => {
     return () => window.removeEventListener("keydown", handleKey);
   }, [currentPage, totalPages, toggleDarkMode]);
 
-  // --- СВАЙПЫ НА МОБИЛЬНЫХ ---
+  // --- СВАЙПЫ (только логика, без визуального сдвига) ---
   const handleTouchStart = (e) => {
     if (e.target.tagName === "INPUT") return;
     touchStartX.current = e.touches[0].clientX;
-    swipeStartX.current = e.touches[0].clientX;
     isSwipeActive.current = true;
-    setSwipeOffset(0);
   };
 
   const handleTouchMove = (e) => {
     if (!isSwipeActive.current) return;
-    const currentX = e.touches[0].clientX;
-    const diff = currentX - swipeStartX.current;
-    // Ограничиваем сдвиг (макс. 100px)
-    setSwipeOffset(Math.max(-100, Math.min(100, diff)));
+    // Ничего не делаем — не отслеживаем сдвиг
   };
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = (e) => {
     if (!isSwipeActive.current) return;
     isSwipeActive.current = false;
 
     const threshold = 50;
-    const diff = swipeOffset;
+    const currentX = e.changedTouches[0].clientX;
+    const diff = currentX - touchStartX.current;
 
     if (diff > threshold) {
-      prevPage(); // ← свайп вправо → предыдущая
+      prevPage(); // ← свайп вправо
     } else if (diff < -threshold) {
-      nextPage(); // → свайп влево → следующая
+      nextPage(); // → свайп влево
     }
-
-    setSwipeOffset(0);
   };
 
   // Обновление высоты аккордеона
@@ -233,7 +225,7 @@ const App = () => {
       <div className="case-list-header">
         <h3>Кейсы {searchTerm && `(${filteredCases.length} найдено)`}</h3>
 
-        {/* Пагинация ТОЛЬКО на десктопе */}
+        {/* Пагинация только на десктопе */}
         {!isMobile && (
           <div className="search-and-pagination">
             <div className="search-in-header">
@@ -431,7 +423,7 @@ const App = () => {
       </header>
 
       <div className="app-container">
-        {/* Список кейсов (аккордеон на мобильных) */}
+        {/* Список кейсов */}
         {isMobile ? (
           <div className="case-list-mobile-wrapper">
             <div className="mobile-accordion">
@@ -464,13 +456,7 @@ const App = () => {
         )}
 
         {/* Просмотр кейса */}
-        <div
-          className={`case-view ${isAnimating ? "fade-out" : "fade-in active"}`}
-          style={{
-            transform: `translateX(${swipeOffset}px)`,
-            transition: isSwipeActive.current ? 'none' : 'transform 0.2s ease'
-          }}
-        >
+        <div className={`case-view ${isAnimating ? "fade-out" : "fade-in active"}`}>
           <div className="breadcrumb">
             Кейс {selectedCase.id} • Страница {currentPage} из {totalPages}
           </div>
