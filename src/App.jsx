@@ -5,8 +5,7 @@ import "./App.css";
 
 const App = () => {
   const [base] = useState(baseList);
-
-  const [selectedCase, setSelectedCase] = useState(base[0]);
+  const [selectedCase, setSelectedCase] = useState(base[0] || null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -18,7 +17,9 @@ const App = () => {
   const inputRef = useRef();
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
+  const caseListPanelRef = useRef(null);
 
+  // Определение мобильного устройства
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
@@ -31,6 +32,7 @@ const App = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Удаление прелоадера
   useEffect(() => {
     if (document.body.classList.contains("loaded")) return;
     document.body.classList.add("loaded");
@@ -41,10 +43,18 @@ const App = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Темная тема с защитой от ошибок localStorage
   useEffect(() => {
-    const saved = localStorage.getItem("darkMode");
+    let saved;
+    try {
+      saved = localStorage.getItem("darkMode");
+    } catch (e) {
+      console.warn("Не удалось прочитать localStorage", e);
+    }
+
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const enabled = saved ? JSON.parse(saved) : prefersDark;
+    const enabled = saved !== null ? JSON.parse(saved) : prefersDark;
+
     setIsDarkMode(enabled);
     if (enabled) {
       document.documentElement.classList.add("dark");
@@ -58,7 +68,11 @@ const App = () => {
   const toggleDarkMode = () => {
     const newMode = !isDarkMode;
     setIsDarkMode(newMode);
-    localStorage.setItem("darkMode", JSON.stringify(newMode));
+    try {
+      localStorage.setItem("darkMode", JSON.stringify(newMode));
+    } catch (e) {
+      console.warn("Не удалось сохранить в localStorage", e);
+    }
     if (newMode) {
       document.documentElement.classList.add("dark");
       document.body.classList.add("dark-mode");
@@ -68,6 +82,7 @@ const App = () => {
     }
   };
 
+  // Фильтрация кейсов
   const filteredCases = useMemo(() => {
     if (!searchTerm.trim()) return base;
     const query = searchTerm.toLowerCase().trim();
@@ -77,7 +92,7 @@ const App = () => {
         item.nursingExamination.toLowerCase().includes(query) ||
         item.inspection.toLowerCase().includes(query) ||
         item.appointment.toLowerCase().includes(query) ||
-        item.anamnesis?.toLowerCase().includes(query) ||
+        (item.anamnesis && item.anamnesis.toLowerCase().includes(query)) ||
         item.patientProblems.some((p) => p.problem.toLowerCase().includes(query)) ||
         item.nursingCarePlan.some((p) =>
           p.title.toLowerCase().includes(query) ||
@@ -87,7 +102,7 @@ const App = () => {
     });
   }, [base, searchTerm]);
 
-  const totalPages = Math.ceil(filteredCases.length / itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filteredCases.length / itemsPerPage));
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentCases = filteredCases.slice(startIndex, startIndex + itemsPerPage);
 
@@ -98,18 +113,22 @@ const App = () => {
   const nextPage = () => currentPage < totalPages && goToPage(currentPage + 1);
   const prevPage = () => currentPage > 1 && goToPage(currentPage - 1);
 
+  // Смена кейса с анимацией и скроллом
   const changeCaseWithAnimation = (newCase) => {
-    if (selectedCase.id === newCase.id) return;
+    if (!newCase || selectedCase?.id === newCase.id) return;
     setIsAnimating(true);
     setTimeout(() => {
       setSelectedCase(newCase);
       setIsAnimating(false);
       if (isMobile) setIsMobileAccordionOpen(false);
-      const activeElement = document.querySelector('.case-item.active');
-      activeElement?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      requestAnimationFrame(() => {
+        const activeElement = document.querySelector('.case-item.active');
+        activeElement?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
     }, 150);
   };
 
+  // Обработка клавиш
   useEffect(() => {
     const handleKey = (e) => {
       if (e.target.tagName === "INPUT") return;
@@ -120,10 +139,8 @@ const App = () => {
         setTimeout(() => inputRef.current?.classList.remove("focus-hint"), 600);
       } else if (e.key === "ArrowRight") {
         if (currentPage < totalPages) nextPage();
-        playSwipeSound();
       } else if (e.key === "ArrowLeft") {
         if (currentPage > 1) prevPage();
-        playSwipeSound();
       } else if (e.key === "t" && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
         toggleDarkMode();
@@ -132,22 +149,17 @@ const App = () => {
 
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [currentPage, totalPages, isDarkMode]);
+  }, [currentPage, totalPages, toggleDarkMode]);
 
-  const playSwipeSound = () => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const utterance = new SpeechSynthesisUtterance("");
-    utterance.volume = 0;
-    window.speechSynthesis.speak(utterance);
-  };
-
+  // Подсветка текста
   const highlightText = (text, query) => {
-    if (!query || !text) return <span>{text}</span>;
+    const safeText = String(text || '');
+    if (!query || !safeText.trim()) return <span>{safeText}</span>;
     const keywords = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
-    if (keywords.length === 0) return <span>{text}</span>;
+    if (keywords.length === 0) return <span>{safeText}</span>;
     const escaped = keywords.map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
     const regex = new RegExp(`(${escaped.join("|")})`, "gi");
-    const parts = text.split(regex);
+    const parts = safeText.split(regex);
     return (
       <span>
         {parts.map((part, i) =>
@@ -161,8 +173,10 @@ const App = () => {
     );
   };
 
+  // Touch-события
   const handleTouchStart = (e) => {
     touchStartX.current = e.touches[0].clientX;
+    touchEndX.current = 0;
   };
 
   const handleTouchMove = (e) => {
@@ -172,16 +186,28 @@ const App = () => {
   const handleTouchEnd = () => {
     const diff = touchStartX.current - touchEndX.current;
     const threshold = 50;
-    if (Math.abs(diff) < threshold) return;
+    if (Math.abs(diff) < threshold) {
+      touchEndX.current = 0;
+      return;
+    }
     if (diff > 0 && currentPage < totalPages) {
       nextPage();
-      playSwipeSound();
     } else if (diff < 0 && currentPage > 1) {
       prevPage();
-      playSwipeSound();
     }
+    touchEndX.current = 0;
   };
 
+  // Обновление высоты аккордеона
+  useEffect(() => {
+    if (isMobileAccordionOpen && caseListPanelRef.current) {
+      caseListPanelRef.current.style.maxHeight = `${caseListPanelRef.current.scrollHeight + 20}px`;
+    } else if (caseListPanelRef.current) {
+      caseListPanelRef.current.style.maxHeight = '0px';
+    }
+  }, [isMobileAccordionOpen, filteredCases, currentPage]);
+
+  // Рендер списка кейсов
   const renderCaseList = () => (
     <>
       <div className="case-list-header">
@@ -243,9 +269,7 @@ const App = () => {
                         </button>
                       );
                     } else if (page === currentPage - 2 || page === currentPage + 2) {
-                      return (
-                        <span key={page} className="ios-pagination-ellipsis">…</span>
-                      );
+                      return <span key={page} className="ios-pagination-ellipsis">…</span>;
                     }
                     return null;
                   })}
@@ -275,7 +299,7 @@ const App = () => {
           return (
             <div
               key={item.id}
-              className={`case-item ${selectedCase.id === item.id ? "active" : ""}`}
+              className={`case-item ${selectedCase?.id === item.id ? "active" : ""}`}
               onClick={() => isMatch && changeCaseWithAnimation(item)}
               style={{
                 opacity: isMatch ? 1 : 0.6,
@@ -298,6 +322,15 @@ const App = () => {
       )}
     </>
   );
+
+  // Если нет кейсов
+  if (!selectedCase) {
+    return (
+      <div className="app">
+        <p>Кейсы не загружены.</p>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -388,17 +421,15 @@ const App = () => {
               </button>
 
               <div
+                ref={caseListPanelRef}
                 className="mobile-accordion-panel"
                 style={{
-                  maxHeight: isMobileAccordionOpen
-                    ? `${document.getElementById('case-list-panel-height')?.scrollHeight + 20}px`
-                    : "0",
                   opacity: isMobileAccordionOpen ? 1 : 0,
                   overflow: "hidden",
                   transition: "max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease",
                 }}
               >
-                <div id="case-list-panel-height">
+                <div>
                   {!searchTerm && totalPages > 1 && (
                     <div className="ios-pagination" style={{ margin: "8px 16px" }}>
                       <button onClick={prevPage} disabled={currentPage === 1} className="ios-pagination-arrow">◀</button>
@@ -435,7 +466,7 @@ const App = () => {
 
         <div className={`case-view ${isAnimating ? "fade-out" : "fade-in active"}`}>
           <div className="breadcrumb">
-            Кейс {selectedCase.id} • Страница {currentPage} из {Math.ceil(filteredCases.length / itemsPerPage)}
+            Кейс {selectedCase.id} • Страница {currentPage} из {totalPages}
           </div>
 
           <h2>Кейс {selectedCase.id}</h2>
@@ -450,7 +481,6 @@ const App = () => {
             <p>{highlightText(selectedCase.nursingExamination, searchTerm)}</p>
           </section>
 
-          {/* Условный рендер: Анамнез */}
           {selectedCase.anamnesis && (
             <section>
               <h4>Анамнез</h4>
@@ -477,7 +507,6 @@ const App = () => {
             </ul>
           </section>
 
-          {/* Условный рендер: Приоритетные проблемы */}
           {selectedCase.priorityProblems && (
             <section>
               <h4>Приоритетные проблемы</h4>
