@@ -9,15 +9,18 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isMobileAccordionOpen, setIsMobileAccordionOpen] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [swipeOffset, setSwipeOffset] = useState(0); // для UX-сдвига
 
   const itemsPerPage = 3;
   const inputRef = useRef();
+  const caseListPanelRef = useRef();
+
   const touchStartX = useRef(0);
-  const touchEndX = useRef(0);
-  const caseListPanelRef = useRef(null);
+  const swipeStartX = useRef(0);
+  const isSwipeActive = useRef(false);
 
   // Определение мобильного устройства
   useEffect(() => {
@@ -110,8 +113,34 @@ const App = () => {
   const displayedCases = hasResults ? currentCases : base;
 
   const goToPage = (page) => setCurrentPage(page);
-  const nextPage = () => currentPage < totalPages && goToPage(currentPage + 1);
-  const prevPage = () => currentPage > 1 && goToPage(currentPage - 1);
+  const nextPage = () => {
+    if (currentPage < totalPages) goToPage(currentPage + 1);
+  };
+  const prevPage = () => {
+    if (currentPage > 1) goToPage(currentPage - 1);
+  };
+
+  // Подсветка текста
+  const highlightText = (text, query) => {
+    const safeText = String(text || '');
+    if (!query || !safeText.trim()) return <span>{safeText}</span>;
+    const keywords = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    if (keywords.length === 0) return <span>{safeText}</span>;
+    const escaped = keywords.map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    const regex = new RegExp(`(${escaped.join("|")})`, "gi");
+    const parts = safeText.split(regex);
+    return (
+      <span>
+        {parts.map((part, i) =>
+          regex.test(part) ? (
+            <mark key={i} className="highlight">{part}</mark>
+          ) : (
+            part
+          )
+        )}
+      </span>
+    );
+  };
 
   // Смена кейса с анимацией
   const changeCaseWithAnimation = (newCase) => {
@@ -151,56 +180,45 @@ const App = () => {
     return () => window.removeEventListener("keydown", handleKey);
   }, [currentPage, totalPages, toggleDarkMode]);
 
-  // Подсветка текста
-  const highlightText = (text, query) => {
-    const safeText = String(text || '');
-    if (!query || !safeText.trim()) return <span>{safeText}</span>;
-    const keywords = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
-    if (keywords.length === 0) return <span>{safeText}</span>;
-    const escaped = keywords.map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
-    const regex = new RegExp(`(${escaped.join("|")})`, "gi");
-    const parts = safeText.split(regex);
-    return (
-      <span>
-        {parts.map((part, i) =>
-          regex.test(part) ? (
-            <mark key={i} className="highlight">{part}</mark>
-          ) : (
-            part
-          )
-        )}
-      </span>
-    );
-  };
-
-  // Touch-события
+  // --- СВАЙПЫ НА МОБИЛЬНЫХ ---
   const handleTouchStart = (e) => {
+    if (e.target.tagName === "INPUT") return;
     touchStartX.current = e.touches[0].clientX;
-    touchEndX.current = 0;
+    swipeStartX.current = e.touches[0].clientX;
+    isSwipeActive.current = true;
+    setSwipeOffset(0);
   };
 
   const handleTouchMove = (e) => {
-    touchEndX.current = e.touches[0].clientX;
+    if (!isSwipeActive.current) return;
+    const currentX = e.touches[0].clientX;
+    const diff = currentX - swipeStartX.current;
+    // Ограничиваем сдвиг (макс. 100px)
+    setSwipeOffset(Math.max(-100, Math.min(100, diff)));
   };
 
   const handleTouchEnd = () => {
-    const diff = touchStartX.current - touchEndX.current;
+    if (!isSwipeActive.current) return;
+    isSwipeActive.current = false;
+
     const threshold = 50;
-    if (Math.abs(diff) < threshold) return;
-    if (diff > 0 && currentPage < totalPages) {
-      nextPage();
-    } else if (diff < 0 && currentPage > 1) {
-      prevPage();
+    const diff = swipeOffset;
+
+    if (diff > threshold) {
+      prevPage(); // ← свайп вправо → предыдущая
+    } else if (diff < -threshold) {
+      nextPage(); // → свайп влево → следующая
     }
+
+    setSwipeOffset(0);
   };
 
-  // Обновление высоты аккордеона — ✅ исправлено
+  // Обновление высоты аккордеона
   useEffect(() => {
     if (!caseListPanelRef.current) return;
     const panel = caseListPanelRef.current;
 
     if (isMobileAccordionOpen) {
-      // Даем браузеру время отрисовать содержимое
       const frame = requestAnimationFrame(() => {
         panel.style.maxHeight = `${panel.scrollHeight + 20}px`;
       });
@@ -210,12 +228,12 @@ const App = () => {
     }
   }, [isMobileAccordionOpen]);
 
-  // Рендер списка кейсов
   const renderCaseList = () => (
     <>
       <div className="case-list-header">
         <h3>Кейсы {searchTerm && `(${filteredCases.length} найдено)`}</h3>
 
+        {/* Пагинация ТОЛЬКО на десктопе */}
         {!isMobile && (
           <div className="search-and-pagination">
             <div className="search-in-header">
@@ -337,13 +355,15 @@ const App = () => {
   return (
     <div
       className="app"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
+      // Свайпы активны только на мобильных
+      onTouchStart={isMobile ? handleTouchStart : undefined}
+      onTouchMove={isMobile ? handleTouchMove : undefined}
+      onTouchEnd={isMobile ? handleTouchEnd : undefined}
     >
       <header className="app-header">
         <h1>Медицинские кейсы</h1>
 
+        {/* Мобильный поиск */}
         {isMobile && (
           <div className="global-search-mobile">
             <div className="search-in-header">
@@ -411,6 +431,7 @@ const App = () => {
       </header>
 
       <div className="app-container">
+        {/* Список кейсов (аккордеон на мобильных) */}
         {isMobile ? (
           <div className="case-list-mobile-wrapper">
             <div className="mobile-accordion">
@@ -429,35 +450,10 @@ const App = () => {
                   opacity: isMobileAccordionOpen ? 1 : 0,
                   overflow: "hidden",
                   transition: "max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease",
-                  maxHeight: '0px' // будет обновлено через useEffect
+                  maxHeight: '0px'
                 }}
               >
                 <div>
-                  {!searchTerm && totalPages > 1 && (
-                    <div className="ios-pagination" style={{ margin: "8px 16px" }}>
-                      <button onClick={prevPage} disabled={currentPage === 1} className="ios-pagination-arrow">◀</button>
-                      <div className="ios-pagination-pages">
-                        {Array.from({ length: totalPages }, (_, i) => {
-                          const page = i + 1;
-                          if (page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1) {
-                            return (
-                              <button
-                                key={page}
-                                onClick={() => goToPage(page)}
-                                className={`ios-pagination-page ${page === currentPage ? "active" : ""}`}
-                              >
-                                {page}
-                              </button>
-                            );
-                          } else if (page === currentPage - 2 || page === currentPage + 2) {
-                            return <span key={page} className="ios-pagination-ellipsis">…</span>;
-                          }
-                          return null;
-                        })}
-                      </div>
-                      <button onClick={nextPage} disabled={currentPage === totalPages} className="ios-pagination-arrow">▶</button>
-                    </div>
-                  )}
                   {renderCaseList()}
                 </div>
               </div>
@@ -467,7 +463,14 @@ const App = () => {
           <div className="case-list">{renderCaseList()}</div>
         )}
 
-        <div className={`case-view ${isAnimating ? "fade-out" : "fade-in active"}`}>
+        {/* Просмотр кейса */}
+        <div
+          className={`case-view ${isAnimating ? "fade-out" : "fade-in active"}`}
+          style={{
+            transform: `translateX(${swipeOffset}px)`,
+            transition: isSwipeActive.current ? 'none' : 'transform 0.2s ease'
+          }}
+        >
           <div className="breadcrumb">
             Кейс {selectedCase.id} • Страница {currentPage} из {totalPages}
           </div>
