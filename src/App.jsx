@@ -5,6 +5,7 @@ import "./App.css";
 
 const App = () => {
   const [base] = useState(baseList);
+
   const [selectedCase, setSelectedCase] = useState(base[0]);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -18,7 +19,6 @@ const App = () => {
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
 
-  // === Определение мобильного устройства ===
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
@@ -26,13 +26,11 @@ const App = () => {
       setIsMobile(mobile);
       setIsMobileAccordionOpen(!mobile);
     };
-
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // === Удаление preloader ===
   useEffect(() => {
     if (document.body.classList.contains("loaded")) return;
     document.body.classList.add("loaded");
@@ -43,7 +41,6 @@ const App = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // === Проверка темы ===
   useEffect(() => {
     const saved = localStorage.getItem("darkMode");
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -58,7 +55,6 @@ const App = () => {
     }
   }, []);
 
-  // === Переключение темы ===
   const toggleDarkMode = () => {
     const newMode = !isDarkMode;
     setIsDarkMode(newMode);
@@ -72,7 +68,6 @@ const App = () => {
     }
   };
 
-  // === Фильтрация (оптимизировано) ===
   const filteredCases = useMemo(() => {
     if (!searchTerm.trim()) return base;
     const query = searchTerm.toLowerCase().trim();
@@ -82,12 +77,11 @@ const App = () => {
         item.nursingExamination.toLowerCase().includes(query) ||
         item.inspection.toLowerCase().includes(query) ||
         item.appointment.toLowerCase().includes(query) ||
-        item.anamnesis.toLowerCase().includes(query) ||
+        item.anamnesis?.toLowerCase().includes(query) ||
         item.patientProblems.some((p) => p.problem.toLowerCase().includes(query)) ||
-        item.nursingCarePlan.some(
-          (p) =>
-            p.title.toLowerCase().includes(query) ||
-            p.plan.some((pl) => pl.planItem.toLowerCase().includes(query))
+        item.nursingCarePlan.some((p) =>
+          p.title.toLowerCase().includes(query) ||
+          p.plan.some((pl) => pl.planItem.toLowerCase().includes(query))
         )
       );
     });
@@ -100,28 +94,22 @@ const App = () => {
   const hasResults = filteredCases.length > 0;
   const displayedCases = hasResults ? currentCases : base;
 
-  // === Навигация ===
   const goToPage = (page) => setCurrentPage(page);
   const nextPage = () => currentPage < totalPages && goToPage(currentPage + 1);
   const prevPage = () => currentPage > 1 && goToPage(currentPage - 1);
 
-  // === Смена кейса с анимацией ===
   const changeCaseWithAnimation = (newCase) => {
     if (selectedCase.id === newCase.id) return;
     setIsAnimating(true);
     setTimeout(() => {
       setSelectedCase(newCase);
       setIsAnimating(false);
-      if (isMobile) {
-        setIsMobileAccordionOpen(false);
-      }
-      // Прокрутка к активному элементу
+      if (isMobile) setIsMobileAccordionOpen(false);
       const activeElement = document.querySelector('.case-item.active');
       activeElement?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }, 150);
   };
 
-  // === Горячие клавиши ===
   useEffect(() => {
     const handleKey = (e) => {
       if (e.target.tagName === "INPUT") return;
@@ -146,7 +134,6 @@ const App = () => {
     return () => window.removeEventListener("keydown", handleKey);
   }, [currentPage, totalPages, isDarkMode]);
 
-  // === Звук свайпа (лёгкий системный) ===
   const playSwipeSound = () => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const utterance = new SpeechSynthesisUtterance("");
@@ -154,7 +141,6 @@ const App = () => {
     window.speechSynthesis.speak(utterance);
   };
 
-  // === Подсветка текста ===
   const highlightText = (text, query) => {
     if (!query || !text) return <span>{text}</span>;
     const keywords = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
@@ -166,9 +152,7 @@ const App = () => {
       <span>
         {parts.map((part, i) =>
           regex.test(part) ? (
-            <mark key={i} className="highlight">
-              {part}
-            </mark>
+            <mark key={i} className="highlight">{part}</mark>
           ) : (
             part
           )
@@ -177,7 +161,6 @@ const App = () => {
     );
   };
 
-  // === Свайпы ===
   const handleTouchStart = (e) => {
     touchStartX.current = e.touches[0].clientX;
   };
@@ -199,13 +182,10 @@ const App = () => {
     }
   };
 
-  // === Вынесенный список кейсов (без дублирования) ===
   const renderCaseList = () => (
     <>
       <div className="case-list-header">
-        <h3>
-          Кейсы {searchTerm && `(${filteredCases.length} найдено)`}
-        </h3>
+        <h3>Кейсы {searchTerm && `(${filteredCases.length} найдено)`}</h3>
 
         {!isMobile && (
           <div className="search-and-pagination">
@@ -252,24 +232,19 @@ const App = () => {
                 <div className="ios-pagination-pages">
                   {Array.from({ length: totalPages }, (_, i) => {
                     const page = i + 1;
-                    const isCurrent = page === currentPage;
-                    const isNear = Math.abs(page - currentPage) <= 1;
-                    const isFirstOrLast = page === 1 || page === totalPages;
-                    if (isFirstOrLast || isNear) {
+                    if (page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1) {
                       return (
                         <button
                           key={page}
                           onClick={() => goToPage(page)}
-                          className={`ios-pagination-page ${isCurrent ? "active" : ""}`}
+                          className={`ios-pagination-page ${page === currentPage ? "active" : ""}`}
                         >
                           {page}
                         </button>
                       );
                     } else if (page === currentPage - 2 || page === currentPage + 2) {
                       return (
-                        <span key={page} className="ios-pagination-ellipsis">
-                          …
-                        </span>
+                        <span key={page} className="ios-pagination-ellipsis">…</span>
                       );
                     }
                     return null;
@@ -334,7 +309,6 @@ const App = () => {
       <header className="app-header">
         <h1>Медицинские кейсы</h1>
 
-        {/* Глобальный поиск на мобильных */}
         {isMobile && (
           <div className="global-search-mobile">
             <div className="search-in-header">
@@ -375,9 +349,7 @@ const App = () => {
               📁 <strong>{base.length}</strong> кейс(а/ов)
             </span>
             {searchTerm && (
-              <span
-                className={`stat-item stat-found ${filteredCases.length === 0 ? "stat-found-zero" : ""}`}
-              >
+              <span className={`stat-item stat-found ${filteredCases.length === 0 ? "stat-found-zero" : ""}`}>
                 🔍 Найдено: <strong>{filteredCases.length}</strong>
               </span>
             )}
@@ -404,7 +376,6 @@ const App = () => {
       </header>
 
       <div className="app-container">
-        {/* Список кейсов */}
         {isMobile ? (
           <div className="case-list-mobile-wrapper">
             <div className="mobile-accordion">
@@ -420,7 +391,7 @@ const App = () => {
                 className="mobile-accordion-panel"
                 style={{
                   maxHeight: isMobileAccordionOpen
-                    ? `${document.getElementById(`case-list-panel-height`)?.scrollHeight + 20}px`
+                    ? `${document.getElementById('case-list-panel-height')?.scrollHeight + 20}px`
                     : "0",
                   opacity: isMobileAccordionOpen ? 1 : 0,
                   overflow: "hidden",
@@ -462,7 +433,6 @@ const App = () => {
           <div className="case-list">{renderCaseList()}</div>
         )}
 
-        {/* Просмотр кейса */}
         <div className={`case-view ${isAnimating ? "fade-out" : "fade-in active"}`}>
           <div className="breadcrumb">
             Кейс {selectedCase.id} • Страница {currentPage} из {Math.ceil(filteredCases.length / itemsPerPage)}
@@ -480,10 +450,13 @@ const App = () => {
             <p>{highlightText(selectedCase.nursingExamination, searchTerm)}</p>
           </section>
 
-          <section>
-            <h4>Анамнез</h4>
-            <p>{highlightText(selectedCase.anamnesis || "Не указан", searchTerm)}</p>
-          </section>
+          {/* Условный рендер: Анамнез */}
+          {selectedCase.anamnesis && (
+            <section>
+              <h4>Анамнез</h4>
+              <p>{highlightText(selectedCase.anamnesis, searchTerm)}</p>
+            </section>
+          )}
 
           <section>
             <h4>Объективно</h4>
@@ -503,6 +476,14 @@ const App = () => {
               ))}
             </ul>
           </section>
+
+          {/* Условный рендер: Приоритетные проблемы */}
+          {selectedCase.priorityProblems && (
+            <section>
+              <h4>Приоритетные проблемы</h4>
+              <p>{highlightText(selectedCase.priorityProblems, searchTerm)}</p>
+            </section>
+          )}
 
           <section>
             <h4>План сестринского ухода</h4>
@@ -524,7 +505,6 @@ const App = () => {
         </div>
       </div>
 
-      {/* Кнопка "Наверх" */}
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         className="scroll-top"
