@@ -67,27 +67,7 @@ body {
   --transition-fast: 0.15s ease;
 }
 
-/* === ТЁМНАЯ ТЕМА (системная) === */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-primary: #000000;
-    --bg-secondary: #1c1c1e;
-    --bg-tertiary: #2c2c2e;
-    --bg-card: #1c1c1e;
-    --text-primary: #f8f8f8;
-    --text-secondary: #8e8e93;
-    --text-tertiary: #6e6e71;
-    --accent: #0a84ff;
-    --accent-hover: #0077ed;
-    --accent-active: #0062d3;
-    --separator: #3a3a3c;
-    --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.5);
-    --highlight: #ffd60a;
-  }
-}
-
-/* === РУЧНОЕ ПЕРЕКЛЮЧЕНИЕ ТЕМЫ === */
+/* === ТЁМНАЯ ТЕМА (ручное переключение) === */
 html.dark {
   --bg-primary: #000000;
   --bg-secondary: #1c1c1e;
@@ -96,6 +76,7 @@ html.dark {
   --text-primary: #f8f8f8;
   --accent: #0a84ff;
   --accent-hover: #0077ed;
+  --accent-active: #0062d3;
   --separator: #3a3a3c;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.5);
@@ -393,7 +374,7 @@ html.dark {
   color: var(--text-primary);
 }
 
-/* === ПАГИНАЦИЯ (iOS-style, центрирована, фиксированная ширина) === */
+/* === ПАГИНАЦИЯ (iOS-style, центрирована, адаптивна) === */
 .ios-pagination {
   display: inline-flex;
   align-items: center;
@@ -407,26 +388,28 @@ html.dark {
   white-space: nowrap;
   justify-content: center;
   height: 34px;
-  min-width: 180px;
-  max-width: 220px;
+  min-width: 160px;
+  max-width: 100%;
   width: auto;
-  margin: 0 auto;
+  margin: 8px auto;
   box-sizing: border-box;
+  overflow: hidden;
   box-shadow: var(--shadow);
 }
 
-.ios-pagination-arrow {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 16px;
+.ios-pagination-arrow,
+.ios-pagination-page {
   width: 30px;
   height: 30px;
-  cursor: pointer;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  font-size: 16px;
+  color: var(--text-secondary);
+  cursor: pointer;
   transition: background var(--transition);
   flex-shrink: 0;
 }
@@ -450,24 +433,9 @@ html.dark {
 }
 
 .ios-pagination-page {
-  width: 30px;
   height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
   border-radius: 14px;
-  font-size: 14px;
-  color: var(--text-secondary);
-  cursor: pointer;
   font-weight: 500;
-  transition: background var(--transition);
-  flex-shrink: 0;
-}
-
-.ios-pagination-page:hover {
-  background: var(--bg-tertiary);
 }
 
 .ios-pagination-page.active {
@@ -553,7 +521,7 @@ html.dark {
   hyphens: auto;
 }
 
-/* === ПРОСМОТР КЕЙСА — iOS стиль (Notes, Settings) === */
+/* === ПРОСМОТР КЕЙСА — iOS стиль === */
 .case-view {
   flex: 1 1 65%;
   min-width: 300px;
@@ -583,7 +551,6 @@ html.dark {
   transform: translateY(0);
 }
 
-/* Заголовок */
 .case-view h2 {
   font-size: 24px;
   font-weight: 600;
@@ -604,7 +571,6 @@ html.dark {
   line-height: 1.3;
 }
 
-/* Текст */
 .case-view p {
   color: var(--text-primary);
   font-size: 17px;
@@ -616,7 +582,6 @@ html.dark {
   text-align: left;
 }
 
-/* Списки */
 .case-view ul,
 .case-view ol {
   padding-left: 18px;
@@ -646,7 +611,6 @@ html.dark {
   opacity: 0.9;
 }
 
-/* Код */
 .case-view code {
   font-family: 'SF Mono', 'SFMono-Regular', 'Consolas', 'Liberation Mono', Menlo, Courier, monospace;
   background: var(--bg-secondary);
@@ -678,7 +642,6 @@ html.dark {
   font-size: 1em;
 }
 
-/* Цитаты */
 .case-view blockquote {
   border-left: 3px solid var(--accent);
   margin: 12px 0;
@@ -689,7 +652,6 @@ html.dark {
   opacity: 0.95;
 }
 
-/* Брокриумб */
 .breadcrumb {
   font-size: 13px;
   color: var(--text-tertiary);
@@ -698,7 +660,6 @@ html.dark {
   opacity: 0.85;
 }
 
-/* Подсветка */
 .highlight {
   background: var(--highlight);
   color: #000;
@@ -708,7 +669,6 @@ html.dark {
   line-height: inherit;
 }
 
-/* Таблицы */
 .case-view table {
   width: 100%;
   border-collapse: collapse;
@@ -732,7 +692,6 @@ html.dark {
   border-bottom: none;
 }
 
-/* Ссылки */
 .case-view a {
   color: var(--accent);
   text-decoration: none;
@@ -750,7 +709,6 @@ html.dark {
   opacity: 0.7;
 }
 
-/* Изображения */
 .case-view img {
   max-width: 100%;
   height: auto;
@@ -764,7 +722,6 @@ html.dark {
   transform: scale(1.01);
 }
 
-/* Разделители */
 .case-view hr {
   border: none;
   border-top: 0.5px solid var(--separator);
@@ -824,6 +781,13 @@ html.dark {
 .mobile-accordion-panel {
   background: var(--bg-card);
   overflow: hidden;
+  padding: 0 8px;
+  box-sizing: border-box;
+}
+
+.mobile-accordion-panel > div {
+  padding: 0 8px;
+  box-sizing: border-box;
 }
 
 /* === ТЕНЬ ПРИ ПРОКРУТКЕ === */
@@ -951,28 +915,6 @@ html.dark {
 
   .case-list-header {
     padding: 12px 14px;
-  }
-
-  /* === Адаптация пагинации на мобильных === */
-  .ios-pagination {
-    min-width: 160px;
-    max-width: 200px;
-    padding: 4px 6px;
-    font-size: 13px;
-  }
-
-  .ios-pagination-arrow,
-  .ios-pagination-page {
-    width: 28px;
-    height: 28px;
-  }
-
-  .ios-pagination-page {
-    height: 24px;
-  }
-
-  .ios-pagination-ellipsis {
-    margin: 0 3px;
   }
 
   .case-view h2 {
@@ -1132,6 +1074,30 @@ html.dark .ios-loader-text {
   .ios-loader-text {
     font-size: 14px;
   }
+
+  /* Адаптация пагинации на узких экранах */
+  .ios-pagination {
+    min-width: 150px;
+    padding: 4px 6px;
+    font-size: 13px;
+    gap: 4px;
+    height: 30px;
+  }
+
+  .ios-pagination-arrow,
+  .ios-pagination-page {
+    width: 26px;
+    height: 26px;
+    font-size: 14px;
+  }
+
+  .ios-pagination-page {
+    height: 24px;
+  }
+
+  .ios-pagination-ellipsis {
+    margin: 0 2px;
+  }
 }
 
 body.loaded #preloader {
@@ -1139,4 +1105,3 @@ body.loaded #preloader {
   pointer-events: none;
   transition: opacity 0.6s ease;
 }
-
