@@ -69,7 +69,7 @@ html.dark {
   --bg-secondary: #1c1c1e;
   --bg-tertiary: #2c2c2e;
   --bg-card: #1c1c1e;
-  --text-primary: #f8f8f8; /* Мягкий белый вместо чистого #ffffff */
+  --text-primary: #f8f8f8;
   --text-secondary: #8e8e93;
   --text-tertiary: #6e6e71;
   --accent: #0a84ff;
@@ -279,7 +279,7 @@ html.dark {
   margin-bottom: 8px;
 }
 
-/* === ПОИСК И ПАГИНАЦИЯ === */
+/* === ПОИСК И ПАГИНАЦИЯ — блок под заголовком === */
 .search-and-pagination {
   display: flex;
   flex-direction: column;
@@ -289,6 +289,7 @@ html.dark {
   align-items: center;
 }
 
+/* === ПОИСК В ШАПКЕ === */
 .search-in-header {
   position: relative;
   width: 100%;
@@ -300,7 +301,6 @@ html.dark {
   flex: 1;
   width: 100%;
   height: 36px;
-  padding: 0 36px 0 12px;
   font-size: 15px;
   border: none;
   border-radius: 18px;
@@ -308,14 +308,46 @@ html.dark {
   background: var(--bg-primary);
   color: var(--text-primary);
   transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  padding: 0 36px 0 36px; /* с учётом иконки */
 }
 
 .search-input-header:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 1px var(--accent);
-  outline: none;
 }
 
+.search-input-header.focus-hint {
+  animation: pulse 0.6s ease;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 2px var(--accent); }
+  50% { box-shadow: 0 0 0 4px var(--accent); }
+  100% { box-shadow: 0 0 0 2px var(--accent); }
+}
+
+/* === ИКОНКА ЛУПЫ В ПОИСКЕ === */
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-tertiary);
+  font-size: 16px;
+  pointer-events: none;
+}
+
+/* === СЧЁТЧИК СИМВОЛОВ === */
+.search-counter {
+  position: absolute;
+  right: 36px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+/* === КНОПКА ОЧИСТКИ === */
 .clear-btn-header {
   position: absolute;
   right: 10px;
@@ -340,7 +372,7 @@ html.dark {
   color: var(--text-primary);
 }
 
-/* === ПАГИНАЦИЯ === */
+/* === ПАГИНАЦИЯ (iOS-style) === */
 .ios-pagination {
   display: inline-flex;
   align-items: center;
@@ -356,6 +388,7 @@ html.dark {
   height: 34px;
   margin: 0 auto;
   box-shadow: var(--shadow);
+  -webkit-user-select: none;
 }
 
 .ios-pagination-arrow {
@@ -371,6 +404,7 @@ html.dark {
   align-items: center;
   justify-content: center;
   transition: background var(--transition);
+  -webkit-tap-highlight-color: transparent;
 }
 
 .ios-pagination-arrow:disabled {
@@ -422,16 +456,17 @@ html.dark {
 }
 
 /* === ПУСТОЙ РЕЗУЛЬТАТ === */
-.no-results {
+.no-results-illustrated {
   text-align: center;
+  padding: 40px 20px;
   color: var(--text-tertiary);
   font-size: 14px;
-  padding: 40px 20px;
-  font-style: italic;
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+}
+
+.no-results-illustrated span {
+  font-size: 28px;
+  margin-bottom: 8px;
+  display: block;
 }
 
 /* === ЭЛЕМЕНТ СПИСКА === */
@@ -501,6 +536,18 @@ html.dark {
   gap: 16px;
 }
 
+.case-view.fade-out {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.case-view.fade-in,
+.case-view.fade-in.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* === ЗАГОЛОВКИ В ПРОСМОТРЕ === */
 .case-view h2 {
   font-size: 24px;
   font-weight: 600;
@@ -518,13 +565,14 @@ html.dark {
   margin-bottom: 8px;
 }
 
+/* === ТЕКСТ И СПИСКИ === */
 .case-view p,
 .case-view ul,
 .case-view ol {
   font-size: 17px;
   color: var(--text-primary);
   margin: 8px 0;
-  line-height: 1.6; /* Улучшено */
+  line-height: 1.6;
 }
 
 .case-view ul,
@@ -534,7 +582,7 @@ html.dark {
 
 .case-view li {
   margin: 4px 0;
-  hyphens: auto; /* Переносы слов */
+  hyphens: auto;
   word-break: break-word;
 }
 
@@ -548,17 +596,12 @@ html.dark {
   line-height: inherit;
 }
 
-/* === АНИМАЦИЯ ПРОСМОТРА === */
-.fade-in {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-
-.fade-out {
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.15s ease;
+/* === БРОКРИУМБ (ХЛЕБНЫЕ КРОШКИ) === */
+.breadcrumb {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+  font-style: italic;
 }
 
 /* === КНОПКА "НАВЕРХ" === */
@@ -647,8 +690,37 @@ html.dark {
 
 .mobile-accordion-panel {
   background: var(--bg-card);
-  transition: max-height 0.35s ease, opacity 0.25s ease;
   overflow: hidden;
+}
+
+/* === ТЕНЬ ПРИ ПРОКРУТКЕ В СПИСКЕ === */
+.case-list.has-shadow::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.08), transparent);
+  pointer-events: none;
+  z-index: 1;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+/* === ПОДСКАЗКА ПОИСКА (/) === */
+.search-hint {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.search-hint kbd {
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-size: 11px;
+  font-weight: 500;
 }
 
 /* === АДАПТИВНОСТЬ (мобильные) === */
@@ -693,7 +765,7 @@ html.dark {
 
   .search-input-header {
     font-size: 14px;
-    padding: 0 32px 0 10px;
+    padding: 0 32px 0 32px;
   }
 
   .clear-btn-header {
@@ -704,7 +776,7 @@ html.dark {
   }
 
   .case-item p {
-    font-size: 15px; /* Увеличили для мобильных — улучшает читаемость */
+    font-size: 15px;
     line-height: 1.5;
   }
 
@@ -777,7 +849,7 @@ html.dark {
 
   .case-view {
     padding: 40px;
-    font-size: 17px; /* Уменьшено с 18px до 17px */
+    font-size: 17px;
   }
 }
 
@@ -788,6 +860,13 @@ html.dark {
   *::after {
     transition: none !important;
     animation: none !important;
+  }
+
+  .case-view.fade-in,
+  .case-view.fade-out {
+    transition: none;
+    opacity: 1;
+    transform: none;
   }
 }
 
