@@ -23,6 +23,7 @@ html {
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif;
+  font-optical-sizing: auto;
   background: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.6;
@@ -68,7 +69,7 @@ html.dark {
   --bg-secondary: #1c1c1e;
   --bg-tertiary: #2c2c2e;
   --bg-card: #1c1c1e;
-  --text-primary: #ffffff;
+  --text-primary: #f8f8f8; /* Мягкий белый вместо чистого #ffffff */
   --text-secondary: #8e8e93;
   --text-tertiary: #6e6e71;
   --accent: #0a84ff;
@@ -254,7 +255,7 @@ html.dark {
   position: relative;
 }
 
-/* === ШАПКА СПИСКА — заголовок, поиск, пагинация === */
+/* === ШАПКА СПИСКА === */
 .case-list-header {
   display: flex;
   flex-direction: column;
@@ -278,7 +279,7 @@ html.dark {
   margin-bottom: 8px;
 }
 
-/* === ПОИСК И ПАГИНАЦИЯ — блок под заголовком === */
+/* === ПОИСК И ПАГИНАЦИЯ === */
 .search-and-pagination {
   display: flex;
   flex-direction: column;
@@ -288,7 +289,6 @@ html.dark {
   align-items: center;
 }
 
-/* === ПОИСК В ШАПКЕ === */
 .search-in-header {
   position: relative;
   width: 100%;
@@ -302,14 +302,12 @@ html.dark {
   height: 36px;
   padding: 0 36px 0 12px;
   font-size: 15px;
-  border: 0.5px solid var(--separator);
+  border: none;
   border-radius: 18px;
   outline: none;
   background: var(--bg-primary);
   color: var(--text-primary);
   transition: border-color 0.25s ease, box-shadow 0.25s ease;
-  -webkit-appearance: none;
-  border: none;
 }
 
 .search-input-header:focus {
@@ -342,7 +340,7 @@ html.dark {
   color: var(--text-primary);
 }
 
-/* === ПАГИНАЦИЯ (iOS-style) === */
+/* === ПАГИНАЦИЯ === */
 .ios-pagination {
   display: inline-flex;
   align-items: center;
@@ -358,7 +356,6 @@ html.dark {
   height: 34px;
   margin: 0 auto;
   box-shadow: var(--shadow);
-  -webkit-user-select: none;
 }
 
 .ios-pagination-arrow {
@@ -374,7 +371,6 @@ html.dark {
   align-items: center;
   justify-content: center;
   transition: background var(--transition);
-  -webkit-tap-highlight-color: transparent;
 }
 
 .ios-pagination-arrow:disabled {
@@ -528,7 +524,7 @@ html.dark {
   font-size: 17px;
   color: var(--text-primary);
   margin: 8px 0;
-  line-height: 1.5;
+  line-height: 1.6; /* Улучшено */
 }
 
 .case-view ul,
@@ -538,6 +534,8 @@ html.dark {
 
 .case-view li {
   margin: 4px 0;
+  hyphens: auto; /* Переносы слов */
+  word-break: break-word;
 }
 
 /* === ПОДСВЕТКА ТЕКСТА === */
@@ -706,7 +704,8 @@ html.dark {
   }
 
   .case-item p {
-    font-size: 13px;
+    font-size: 15px; /* Увеличили для мобильных — улучшает читаемость */
+    line-height: 1.5;
   }
 
   .case-item {
@@ -778,7 +777,7 @@ html.dark {
 
   .case-view {
     padding: 40px;
-    font-size: 18px;
+    font-size: 17px; /* Уменьшено с 18px до 17px */
   }
 }
 
@@ -828,13 +827,6 @@ html.dark {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   max-width: 280px;
   text-align: center;
-}
-
-.ios-loader-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
 }
 
 .ios-loader-spinner {
